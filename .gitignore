@@ -26,7 +26,21 @@
 *.a
 *.lib
 
+# Compiler files
+*.su
+*.list
+*.map
+*.size
+*.elf
+*.bin
+
 # Executables
 *.exe
 *.out
 *.app
+
+#Apple
+.DS_Store
+
+udp_send
+/gd32_emac_debug_ntp-ptp

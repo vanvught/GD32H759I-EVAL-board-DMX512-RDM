@@ -1,0 +1,11 @@
+DEFINES=NDEBUG  
+
+EXTRA_INCLUDES=../lib-rdm/include ../lib-properties/include
+
+ifneq ($(MAKE_FLAGS),)
+else
+	DEFINES+=OUTPUT_DMX_SEND
+endif
+
+include Rules.mk
+include ../firmware-template-gd32/lib/Rules.mk
