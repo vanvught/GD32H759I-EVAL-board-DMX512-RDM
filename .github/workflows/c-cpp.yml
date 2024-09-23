@@ -21,21 +21,27 @@ jobs:
         make -f Makefile.GD32 clean
         make -f Makefile.GD32
         cd -
-    - name: make gd32_emac_artnet_pixel_multi
-      run: |
-        cd gd32_emac_artnet_pixel_multi
-        make -f Makefile.GD32 clean
-        make -f Makefile.GD32
-        cd -
     - name: make gd32_emac_e131_dmx_multi
       run: |
         cd gd32_emac_e131_dmx_multi
         make -f Makefile.GD32 clean
         make -f Makefile.GD32
         cd -
-    - name: make gd32_emac_e131_pixel_multi
+    - name: make gd32_emac_eve_example
       run: |
-        cd gd32_emac_e131_pixel_multi
+        cd gd32_emac_eve_example
+        make -f Makefile.GD32 clean
+        make -f Makefile.GD32
+        cd -
+   - name: make gd32_emac_llrp
+      run: |
+        cd gd32_emac_llrp
+        make -f Makefile.GD32 clean
+        make -f Makefile.GD32
+        cd -
+   - name: make gd32_emac_pwm_example
+      run: |
+        cd gd32_emac_pwm_example
         make -f Makefile.GD32 clean
         make -f Makefile.GD32
         cd -
