@@ -62,26 +62,26 @@
  @details Initialise the EVE API layer, HAL layer and MCU-specific hardware
  	 layer.
  */
-void EVE_Init(void);
+void EVE_Init();
 
 /**
  @brief EVE API: Begin coprocessor list
  @details Starts a coprocessor list. Waits for the coprocessor to be idle
  	 before asserting chip select.
  */
-void EVE_LIB_BeginCoProList(void);
+void EVE_LIB_BeginCoProList();
 
 /**
  @brief EVE API: End coprocessor list
  @details Ends a coprocessor list. Deasserts chip select.
  */
-void EVE_LIB_EndCoProList(void);
+void EVE_LIB_EndCoProList();
 
 /**
  @brief EVE API: Waits for coprocessor list to end
  @details Will poll the coprocessor command list until it has been completed.
  */
-void EVE_LIB_AwaitCoProEmpty(void);
+void EVE_LIB_AwaitCoProEmpty();
 
 /**
  @brief EVE API: Write a buffer to memory mapped RAM
@@ -176,12 +176,12 @@ void EVE_CALL(uint16_t dest);
 void EVE_JUMP(uint16_t dest);
 void EVE_BEGIN(uint8_t prim);
 void EVE_COLOR_MASK(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-void EVE_END(void);
-void EVE_SAVE_CONTEXT(void);
-void EVE_RESTORE_CONTEXT(void);
-void EVE_RETURN(void);
+void EVE_END();
+void EVE_SAVE_CONTEXT();
+void EVE_RESTORE_CONTEXT();
+void EVE_RETURN();
 void EVE_MACRO(uint8_t m);
-void EVE_DISPLAY(void);
+void EVE_DISPLAY();
 
 
 
@@ -196,7 +196,7 @@ void EVE_DISPLAY(void);
 //void EVE_CMD_BUTTON(int16_t x, int16_t y, int16_t w, int16_t h, int16_t font, uint16_t options, const char* string);
 void EVE_CMD_KEYS(int16_t x, int16_t y, int16_t w, int16_t h, int16_t font, uint16_t options, const char* string);
 void EVE_CMD_NUMBER(int16_t x, int16_t y, int16_t font, uint16_t options, int32_t n);
-void EVE_CMD_LOADIDENTITY(void);
+void EVE_CMD_LOADIDENTITY();
 //void EVE_CMD_TOGGLE(int16_t x, int16_t y, int16_t w, int16_t font, uint16_t options, uint16_t state, const char* string);
 void EVE_CMD_GAUGE(int16_t x, int16_t y, int16_t r, uint16_t options, uint16_t major, uint16_t minor, uint16_t val, uint16_t range);
 void EVE_CMD_REGREAD(uint32_t ptr, uint32_t result);
@@ -204,10 +204,10 @@ void EVE_CMD_GETPROPS(uint32_t ptr, uint32_t w, uint32_t h);
 void EVE_CMD_MEMCPY(uint32_t dest, uint32_t src, uint32_t num);
 void EVE_CMD_SPINNER(int16_t x, int16_t y, uint16_t style, uint16_t scale);
 void EVE_CMD_BGCOLOR(uint32_t c);
-void EVE_CMD_SWAP(void);
+void EVE_CMD_SWAP();
 void EVE_CMD_INFLATE(uint32_t ptr);
 void EVE_CMD_TRANSLATE(int32_t tx, int32_t ty);
-void EVE_CMD_STOP(void);
+void EVE_CMD_STOP();
 void EVE_CMD_SLIDER(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t options, uint16_t val, uint16_t range);
 void EVE_BITMAP_TRANSFORM_A(long a);
 void EVE_BITMAP_TRANSFORM_B(long b);
@@ -227,22 +227,22 @@ void EVE_CMD_GRADCOLOR(uint32_t c);
 void EVE_CMD_BITMAP_TRANSFORM(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t tx0, int32_t ty0, int32_t tx1, int32_t ty1, int32_t tx2, int32_t ty2, uint16_t result);
 void EVE_CMD_CALIBRATE(uint32_t result);
 void EVE_CMD_SETFONT(uint32_t font, uint32_t ptr);
-void EVE_CMD_LOGO(void);
+void EVE_CMD_LOGO();
 void EVE_CMD_APPEND(uint32_t ptr, uint32_t num);
 void EVE_CMD_MEMZERO(uint32_t ptr, uint32_t num);
 void EVE_CMD_SCALE(int32_t sx, int32_t sy);
 void EVE_CMD_CLOCK(int16_t x, int16_t y, int16_t r, uint16_t options, uint16_t h, uint16_t m, uint16_t s, uint16_t ms);
 void EVE_CMD_GRADIENT(int16_t x0, int16_t y0, uint32_t rgb0, int16_t x1, int16_t y1, uint32_t rgb1);
-void EVE_CMD_SETMATRIX(void);
+void EVE_CMD_SETMATRIX();
 void EVE_CMD_TRACK(int16_t x, int16_t y, int16_t w, int16_t h, int16_t tag);
 void EVE_CMD_GETPTR(uint32_t result);
 void EVE_CMD_PROGRESS(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t options, uint16_t val, uint16_t range);
-void EVE_CMD_COLDSTART(void);
+void EVE_CMD_COLDSTART();
 void EVE_CMD_DIAL(int16_t x, int16_t y, int16_t r, uint16_t options, uint16_t val);
 void EVE_CMD_LOADIMAGE(uint32_t ptr, uint32_t options);
-void EVE_CMD_DLSTART(void);
+void EVE_CMD_DLSTART();
 void EVE_CMD_SNAPSHOT(uint32_t ptr);
-void EVE_CMD_SCREENSAVER(void);
+void EVE_CMD_SCREENSAVER();
 void EVE_CMD_MEMCRC(uint32_t ptr, uint32_t num, uint32_t result);
 uint8_t COUNT_ARGS(const char* string);
 void EVE_CMD_TEXT(int16_t x, int16_t y, int16_t font, uint16_t options, const char* string, ...);
@@ -260,18 +260,18 @@ void EVE_BITMAP_SIZE_H(uint8_t width, uint8_t height);
 void EVE_PALETTE_SOURCE(uint32_t addr);
 void EVE_VERTEX_TRANSLATE_X(uint32_t x);
 void EVE_VERTEX_TRANSLATE_Y(uint32_t y);
-void EVE_NOP(void);
+void EVE_NOP();
 // ---------------   CO-PRO   -------------
 void EVE_CMD_SETROTATE(uint32_t r);
 void EVE_CMD_SETFONT2(uint32_t font, uint32_t ptr, uint32_t firstchar);
 void EVE_CMD_SNAPSHOT2(uint32_t fmt, uint32_t ptr, int16_t x, int16_t y, int16_t w, int16_t h);
 void EVE_CMD_MEDIAFIFO(uint32_t ptr, uint32_t size);
 void EVE_CMD_INT_SWLOADIMAGE(uint32_t ptr, uint32_t options);
-void EVE_CMD_SYNC(void);
+void EVE_CMD_SYNC();
 void EVE_CMD_ROMFONT(uint32_t font, uint32_t romslot);
 void EVE_CMD_PLAYVIDEO(uint32_t options);
 void EVE_CMD_VIDEOFRAME(uint32_t dst, uint32_t ptr);
-void EVE_CMD_VIDEOSTART(void);
+void EVE_CMD_VIDEOSTART();
 void EVE_CMD_SETBASE(uint32_t eve_base);
 void EVE_CMD_SETBITMAP(uint32_t source, uint16_t fmt, uint16_t w, uint16_t h);
 void EVE_CMD_SETSCRATCH(uint32_t handle);

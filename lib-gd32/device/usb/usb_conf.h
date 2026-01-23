@@ -1,8 +1,8 @@
 /**
- * usb_conf.h
+ * @file usb_conf.h
  *
  */
-/* Copyright (C) 2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024-2025 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,15 @@
  * THE SOFTWARE.
  */
 
-#ifndef USB_CONF_H_
-#define USB_CONF_H_
+#ifndef USB_USB_CONF_H_
+#define USB_USB_CONF_H_
 
 #include "gd32.h"
 
-#if defined (GD32H7XX)
-# include "h/usb_conf.h"
+#if defined(GD32H7XX)
+#include "h/usb_conf.h"
 #else
-# include "f/usb_conf.h"
+#include "f/usb_conf.h"
 #endif
 
-#endif /* USB_CONF_H_ */
+#endif // USB_USB_CONF_H_

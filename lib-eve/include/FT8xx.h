@@ -50,11 +50,13 @@
 #ifndef _FT8XX_H_
 #define	_FT8XX_H_
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wold-style-cast"
-#pragma GCC diagnostic ignored "-Wuseless-cast"
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-#pragma GCC diagnostic ignored "-Wconversion"
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wold-style-cast"
+# pragma GCC diagnostic ignored "-Wuseless-cast"
+# pragma GCC diagnostic ignored "-Wsign-conversion"
+# pragma GCC diagnostic ignored "-Wconversion"
+#endif
 
 /* Definitions used for target device selection */
 #define FT800 8
@@ -1354,6 +1356,4 @@ typedef struct
 } EVE_GPU_FONT_HEADER;
 
 /* Nothing beyond this */
-
 #endif	/* _FT8XX_H_ */
-

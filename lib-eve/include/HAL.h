@@ -58,7 +58,7 @@
  	 This will call the MCU-specific initialisation routine and check for
  	 the presence of a supported FT8xx device on the SPI bus.
  */
-void HAL_EVE_Init(void);
+void HAL_EVE_Init();
 
 /**
  @brief Chip Select Control
@@ -102,7 +102,7 @@ void HAL_IncCmdPointer(uint16_t commandSize);
  	 read from the REG_CMD_WRITE register.
  @returns Command memory write pointer
  */
-uint16_t HAL_GetCmdPointer(void);
+uint16_t HAL_GetCmdPointer();
 
 /**
  @brief Commits the current command memory write pointer
@@ -110,7 +110,7 @@ uint16_t HAL_GetCmdPointer(void);
  	 the REG_CMD_WRITE register. This will start the coprocessor
  	 working through items in the display list.
  */
-void HAL_WriteCmdPointer(void);
+void HAL_WriteCmdPointer();
 
 /**
  @brief Wait for display list to complete
@@ -120,7 +120,7 @@ void HAL_WriteCmdPointer(void);
  	 display list.
  @returns Zero for normal completion or 0xff for an error condition.
  */
-uint8_t HAL_WaitCmdFifoEmpty(void);
+uint8_t HAL_WaitCmdFifoEmpty();
 
 /**
  @brief Calculate free space in the command memory.
@@ -130,7 +130,7 @@ uint8_t HAL_WaitCmdFifoEmpty(void);
  	 to ensure that the display list can never create a loop.
  @returns Number of free bytes.
  */
-uint16_t HAL_CheckCmdFreeSpace(void);
+uint16_t HAL_CheckCmdFreeSpace();
 
 /**
  @brief Write a 32 bit value to an EVE memory location
@@ -255,7 +255,7 @@ void HAL_Write8(uint8_t val8);
    	   This function will not control chip select.
  @returns 32 bit value read
  */
-uint32_t HAL_Read32(void);
+uint32_t HAL_Read32();
 
 /**
  @brief Reads a 16 bit value from EVE
@@ -264,7 +264,7 @@ uint32_t HAL_Read32(void);
    	   This function will not control chip select.
  @returns 16 bit value read
  */
-uint16_t HAL_Read16(void);
+uint16_t HAL_Read16();
 
 /**
  @brief Reads a 8 bit value from EVE
@@ -273,6 +273,6 @@ uint16_t HAL_Read16(void);
    	   This function will not control chip select.
  @returns 8 bit value read
  */
-uint8_t HAL_Read8(void);
+uint8_t HAL_Read8();
 
 #endif	/* HAL_HEADER_H */

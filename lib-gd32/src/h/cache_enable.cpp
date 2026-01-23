@@ -2,7 +2,7 @@
  * @file cache_enable.cpp
  *
  */
-/* Copyright (C) 2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024-2025 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,9 +25,10 @@
 
 #include "gd32.h"
 
-void cache_enable() {
-    /* Enable I-Cache */
-    SCB_EnableICache();
-    /* Enable D-Cache */
-    SCB_EnableDCache();
+void CacheEnable()
+{
+    // Enable I-Cache
+    SCB_EnableICache(); // NOLINT
+    // Enable D-Cache
+    SCB_EnableDCache(); // NOLINT
 }

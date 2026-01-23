@@ -2,7 +2,7 @@
  * @file main.cpp
  *
  */
-/* Copyright (C) 2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024-2025 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,81 +24,48 @@
  */
 
 #include <cstdint>
-#include <cassert>
-#include <cstring>
 #include <time.h>
 
-#include "hardware.h"
+#include "gd32/hal_watchdog.h"
 #include "network.h"
-#include "networkconst.h"
-
-#include "net/apps/mdns.h"
-
-#if defined (ENABLE_NTP_CLIENT)
-# include "net/apps/ntpclient.h"
-#endif
-
 #include "displayudf.h"
-#include "displayudfparams.h"
-#include "displayhandler.h"
-
+#include "json/displayudfparams.h"
 #include "remoteconfig.h"
-#include "remoteconfigparams.h"
-
 #include "configstore.h"
-
 #include "firmwareversion.h"
 #include "software_version.h"
-
 #include "gd32_pwm.h"
 
-void Hardware::RebootHandler() {}
+namespace hal {
+void RebootHandler() {
+}
+}  // namespace hal
 
 int main() {
-	Hardware hw;
+	hal::Init();
 	DisplayUdf display;
-	ConfigStore configStore;
-	display.TextStatus(NetworkConst::MSG_NETWORK_INIT, CONSOLE_YELLOW);
-	Network nw;
-	MDNS mDns;
-	display.TextStatus(NetworkConst::MSG_NETWORK_STARTED, CONSOLE_GREEN);
+	ConfigStore config_store;
+	network::Init();
 	FirmwareVersion fw(SOFTWARE_VERSION, __DATE__, __TIME__);
 
 	fw.Print("Debug PWM");
-	
-
-#if defined (ENABLE_NTP_CLIENT)
-	NtpClient ntpClient;
-	ntpClient.Start();
-	ntpClient.Print();
-#endif
 
 	display.SetTitle("Debug");
-	display.Set(2, displayudf::Labels::HOSTNAME);
-	display.Set(3, displayudf::Labels::IP);
-	display.Set(4, displayudf::Labels::VERSION);
-	display.Set(5, displayudf::Labels::BOARDNAME);
-	display.Set(6, displayudf::Labels::NETMASK);
+	display.Set(2, displayudf::Labels::kHostname);
+	display.Set(3, displayudf::Labels::kIp);
+	display.Set(4, displayudf::Labels::kVersion);
+	display.Set(5, displayudf::Labels::kBoardname);
+	display.Set(6, displayudf::Labels::kNetmask);
 
-	DisplayUdfParams displayUdfParams;
+	json::DisplayUdfParams displayudf_params;
+	displayudf_params.Load();
+	displayudf_params.SetAndShow();
 
-	displayUdfParams.Load();
-	displayUdfParams.Set(&display);
 
-	display.Show();
+	RemoteConfig remote_config( remoteconfig::Output::CONFIG, 0);
 
-	RemoteConfig remoteConfig(remoteconfig::Node::RDMNET_LLRP_ONLY, remoteconfig::Output::CONFIG, 0);
 
-	RemoteConfigParams remoteConfigParams;
-	remoteConfigParams.Load();
-	remoteConfigParams.Set(&remoteConfig);
-
-	while (configStore.Flash())
-		;
-
-	mDns.Print();
-
-	hw.WatchdogInit();
+	hal::WatchdogInit();
 
 	auto t1 = time(nullptr);
 
@@ -108,21 +75,14 @@ int main() {
 	gd32_pwm_set_duty_cycle(pwm::Channel::PWM_CHANNEL_3, 75U);
 
 	for (;;) {
-		hw.WatchdogFeed();
-		nw.Run();
-		remoteConfig.Run();
-		configStore.Flash();
-		mDns.Run();
-#if defined (ENABLE_NTP_CLIENT)
-		ntpClient.Run();
-#endif
-		display.Run();
-		hw.Run();
+		hal::WatchdogFeed();
+		network::Run();
+		hal::Run();
 
-		const auto t2 = time(nullptr);
+		const auto kT2 = time(nullptr);
 
-		if (t1 != t2) {
-			t1 = t2;
+		if (t1 != kT2) {
+			t1 = kT2;
 			gd32_pwm_set_duty_cycle(pwm::Channel::PWM_CHANNEL_0, (t1 & 0x7) * 10);
 		}
 	}

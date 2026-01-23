@@ -24,4 +24,5 @@ LIBS=eve
 
 include ../firmware-template-gd32/Rules.mk
 
+
 prerequisites:

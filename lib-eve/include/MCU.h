@@ -63,14 +63,14 @@
  @details Must contain any MCU-specific initialisation. This will typically be
  	 setting up the SPI bus, GPIOs and operating environment requirements.
  */
-void MCU_Init(void);
+void MCU_Init();
 
 /**
  @brief MCU specific setup
  @details Called after the EVE has been power cycled and started. Contains
  	 any MCU-specific configuration options for the EVE.
  */
-void MCU_Setup(void);
+void MCU_Setup();
 
 /**
  @brief MCU specific chip select enable
@@ -79,7 +79,7 @@ void MCU_Setup(void);
  	 The EVE requires chip select to toggle frequently.
  */
 inline void MCU_CSlow() {
-	FUNC_PREFIX(gpio_clr(FT8XX_LCD_CS_GPIO));
+	FUNC_PREFIX(GpioClr(FT8XX_LCD_CS_GPIO));
 }
 
 /**
@@ -89,7 +89,7 @@ inline void MCU_CSlow() {
  	 The EVE requires chip select to toggle frequently.
  */
 inline void MCU_CShigh() {
-	FUNC_PREFIX(gpio_set(FT8XX_LCD_CS_GPIO));
+	FUNC_PREFIX(GpioSet(FT8XX_LCD_CS_GPIO));
 }
 
 /**
@@ -100,7 +100,7 @@ inline void MCU_CShigh() {
  	 deep power saving.
  */
 inline void MCU_PDlow() {
-	FUNC_PREFIX(gpio_clr(FT8XX_LCD_DC_GPIO));
+	FUNC_PREFIX(GpioClr(FT8XX_LCD_DC_GPIO));
 }
 
 /**
@@ -111,7 +111,7 @@ inline void MCU_PDlow() {
  	 recovery from deep power saving.
  */
 inline void MCU_PDhigh() {
-	FUNC_PREFIX(gpio_set(FT8XX_LCD_DC_GPIO));
+	FUNC_PREFIX(GpioSet(FT8XX_LCD_DC_GPIO));
 }
 
 /**
@@ -122,7 +122,7 @@ inline void MCU_PDhigh() {
  @param length - number of bytes to write.
  */
 inline void MCU_SPIWrite(const uint8_t *pDataToWrite, const uint32_t nLength) {
-	FUNC_PREFIX(spi_writenb(reinterpret_cast<const char *>(pDataToWrite), nLength));
+	FUNC_PREFIX(SpiWritenb(reinterpret_cast<const char *>(pDataToWrite), nLength));
 }
 
 /**
@@ -134,7 +134,7 @@ inline void MCU_SPIWrite(const uint8_t *pDataToWrite, const uint32_t nLength) {
 inline uint8_t MCU_SPIRead8() {
 	char buffer[1];
 
-	FUNC_PREFIX(spi_transfern(buffer, 1));
+	FUNC_PREFIX(SpiTransfern(buffer, 1));
 
 	return buffer[0];
 }
@@ -150,7 +150,7 @@ inline void MCU_SPIWrite8(const uint8_t DataToWrite) {
 
 	buffer[0] = DataToWrite;
 
-	FUNC_PREFIX(spi_writenb(buffer, 1));
+	FUNC_PREFIX(SpiWritenb(buffer, 1));
 }
 
 /**
@@ -162,7 +162,7 @@ inline void MCU_SPIWrite8(const uint8_t DataToWrite) {
 inline uint16_t MCU_SPIRead16() {
 	char buffer[2];
 
-	FUNC_PREFIX(spi_transfern(buffer, 2));
+	FUNC_PREFIX(SpiTransfern(buffer, 2));
 
 	return static_cast<uint16_t>((buffer[0] << 8) | buffer[1]);
 }
@@ -174,7 +174,7 @@ inline uint16_t MCU_SPIRead16() {
  @param Data to write to EVE.
  */
 inline void MCU_SPIWrite16(const uint16_t DataToWrite) {
-	FUNC_PREFIX(spi_write(DataToWrite));
+	FUNC_PREFIX(SpiWrite(DataToWrite));
 }
 
 /**
@@ -183,7 +183,7 @@ inline void MCU_SPIWrite16(const uint16_t DataToWrite) {
     	 response.
  @returns Data received from EVE.
  */
-uint32_t MCU_SPIRead24(void);
+uint32_t MCU_SPIRead24();
 
 /**
  @brief MCU specific SPI 24 bit write
@@ -198,7 +198,7 @@ inline void MCU_SPIWrite24(const uint32_t DataToWrite) {
 	buffer[1] = static_cast<uint8_t>(DataToWrite >> 16);
 	buffer[2] = static_cast<uint8_t>(DataToWrite >>  8);
 
-	FUNC_PREFIX(spi_writenb(buffer, 3));
+	FUNC_PREFIX(SpiWritenb(buffer, 3));
 }
 
 /**
@@ -210,7 +210,7 @@ inline void MCU_SPIWrite24(const uint32_t DataToWrite) {
 inline uint32_t MCU_SPIRead32() {
 	char buffer[4];
 
-	FUNC_PREFIX(spi_transfern(buffer, 4));
+	FUNC_PREFIX(SpiTransfern(buffer, 4));
 
 	return static_cast<uint32_t>((buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3]);
 }
@@ -229,7 +229,7 @@ inline void MCU_SPIWrite32(const uint32_t DataToWrite) {
 	buffer[2] = static_cast<uint8_t>(DataToWrite >>  8);
 	buffer[3] = DataToWrite & 0xFF;
 
-	FUNC_PREFIX(spi_writenb(buffer, 4));
+	FUNC_PREFIX(SpiWritenb(buffer, 4));
 }
 
 /**

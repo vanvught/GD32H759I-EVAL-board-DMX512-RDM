@@ -2,7 +2,7 @@
  * @file gd32_adc.cpp
  *
  */
-/* Copyright (C) 2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024-2025 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,19 +27,21 @@
 
 #include "gd32.h"
 
-#define ADC_TEMP_CALIBRATION_VALUE_25		REG16(0x1FF0F7C0)
-#define ADC_TEMP_CALIBRATION_VALUE_MINUS40	REG16(0x1FF0F7C2)
+#define ADC_TEMP_CALIBRATION_VALUE_25 REG16(0x1FF0F7C0)
+#define ADC_TEMP_CALIBRATION_VALUE_MINUS40 REG16(0x1FF0F7C2)
 
 static float avg_slope;
 static int32_t temperature_value_25;
 static int32_t temperature_value_minus40;
 
-static void rcu_config() {
+static void RcuConfig()
+{
     /* enable ADC clock */
     rcu_periph_clock_enable(RCU_ADC2);
 }
 
-static void adc_config() {
+static void AdcConfig()
+{
     /* reset ADC */
     adc_deinit(ADC2);
     /* ADC clock config */
@@ -84,23 +86,26 @@ static void adc_config() {
     adc_software_trigger_enable(ADC2, ADC_INSERTED_CHANNEL);
 }
 
-void gd32_adc_init() {
-	rcu_config();
-	adc_config();
+void Gd32AdcInit()
+{
+    RcuConfig();
+    AdcConfig();
 
-	temperature_value_25 = ADC_TEMP_CALIBRATION_VALUE_25 & 0x0FFF;
-	temperature_value_minus40 = ADC_TEMP_CALIBRATION_VALUE_MINUS40 & 0x0FFF;
-	avg_slope = -(temperature_value_25 - temperature_value_minus40) / (25.0f + 40.0f);
+    temperature_value_25 = ADC_TEMP_CALIBRATION_VALUE_25 & 0x0FFF;
+    temperature_value_minus40 = ADC_TEMP_CALIBRATION_VALUE_MINUS40 & 0x0FFF;
+    avg_slope = -(temperature_value_25 - temperature_value_minus40) / (25.0f + 40.0f);
 }
 
-float gd32_adc_gettemp() {
-	const auto temperature = (temperature_value_25 - ADC_IDATA0(ADC2)) * 3.3f / 4096 / avg_slope * 1000 + 25;
-	adc_software_trigger_enable(ADC2, ADC_INSERTED_CHANNEL);
-	return temperature;
+float G32AdcGetTemp()
+{
+    const auto kTemperature = (temperature_value_25 - ADC_IDATA0(ADC2)) * 3.3f / 4096 / avg_slope * 1000 + 25;
+    adc_software_trigger_enable(ADC2, ADC_INSERTED_CHANNEL);
+    return kTemperature;
 }
 
-float gd32_adc_getvref() {
-	const auto vref_value = (ADC_IDATA1(ADC2) * 3.3f / 4096);
-	adc_software_trigger_enable(ADC2, ADC_INSERTED_CHANNEL);
-	return vref_value;
+float Gd32AdcGetVref()
+{
+    const auto kVrefValue = (ADC_IDATA1(ADC2) * 3.3f / 4096);
+    adc_software_trigger_enable(ADC2, ADC_INSERTED_CHANNEL);
+    return kVrefValue;
 }

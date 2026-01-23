@@ -1,5 +1,5 @@
 /**
- @file EVE_API.c
+ @file EVE_API.cpp
  */
 /*
  * ============================================================================
@@ -54,7 +54,7 @@
 #include "EVE.h"
 #include "HAL.h"
 
-#include "debug.h"
+ #include "firmware/debug/debug_debug.h"
 
 // Set beginning of graphics command memory
 //static uint32_t RAMCommandBuffer = EVE_RAM_CMD;
@@ -63,9 +63,9 @@
 // Library functions
 //##############################################################################
 
-void EVE_Init(void)
+void EVE_Init()
 {
-	DEBUG_ENTRY
+	DEBUG_ENTRY();
 
 	uint8_t regGpio;
 	int i;
@@ -188,13 +188,13 @@ void EVE_Init(void)
 	EVE_LIB_AwaitCoProEmpty();
 #endif
 
-	DEBUG_EXIT
+	DEBUG_EXIT();
 }
 
 // Begins co-pro list for display creation
-void EVE_LIB_BeginCoProList(void)
+void EVE_LIB_BeginCoProList()
 {
-	DEBUG_ENTRY
+	DEBUG_ENTRY();
 
 	// Wait for command FIFO to be empty and record current position in FIFO
 	EVE_LIB_AwaitCoProEmpty();
@@ -204,24 +204,24 @@ void EVE_LIB_BeginCoProList(void)
 	// Send address for writing as the next free location in the co-pro buffer
 	HAL_SetWriteAddress(EVE_RAM_CMD + HAL_GetCmdPointer());
 
-	DEBUG_EXIT
+	DEBUG_EXIT();
 }
 
 // Ends co-pro list for display creation
-void EVE_LIB_EndCoProList(void)
+void EVE_LIB_EndCoProList()
 {
-	DEBUG_ENTRY
+	DEBUG_ENTRY();
 
 	// End SPI transaction
 	HAL_ChipSelect(0);
 	// Update the ring buffer pointer to start decode
 	HAL_WriteCmdPointer();
 
-	DEBUG_EXIT
+	DEBUG_EXIT();
 }
 
 // Waits for the read and write pointers to become equal
-void EVE_LIB_AwaitCoProEmpty(void)
+void EVE_LIB_AwaitCoProEmpty()
 {
 	// Await completion of processing
 	HAL_WaitCmdFifoEmpty();
@@ -582,25 +582,25 @@ void EVE_COLOR_MASK(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 	HAL_IncCmdPointer(4);
 }
 
-void EVE_END(void)
+void EVE_END()
 {
 	HAL_Write32(EVE_ENC_END());
 	HAL_IncCmdPointer(4);
 }
 
-void EVE_SAVE_CONTEXT(void)
+void EVE_SAVE_CONTEXT()
 {
 	HAL_Write32(EVE_ENC_SAVE_CONTEXT());
 	HAL_IncCmdPointer(4);
 }
 
-void EVE_RESTORE_CONTEXT(void)
+void EVE_RESTORE_CONTEXT()
 {
 	HAL_Write32(EVE_ENC_RESTORE_CONTEXT());
 	HAL_IncCmdPointer(4);
 }
 
-void EVE_RETURN(void)
+void EVE_RETURN()
 {
 	HAL_Write32(EVE_ENC_RETURN());
 	HAL_IncCmdPointer(4);
@@ -612,7 +612,7 @@ void EVE_MACRO(uint8_t m)
 	HAL_IncCmdPointer(4);
 }
 
-void EVE_DISPLAY(void)
+void EVE_DISPLAY()
 {
 	HAL_Write32(EVE_ENC_DISPLAY());
 	HAL_IncCmdPointer(4);
@@ -649,7 +649,7 @@ void EVE_CMD_NUMBER(int16_t x, int16_t y, int16_t font, uint16_t options, int32_
 	HAL_IncCmdPointer(16);
 }
 
-void EVE_CMD_LOADIDENTITY(void)
+void EVE_CMD_LOADIDENTITY()
 {
 	HAL_Write32(EVE_ENC_CMD_LOADIDENTITY);
 	HAL_IncCmdPointer(4);
@@ -707,7 +707,7 @@ void EVE_CMD_BGCOLOR(uint32_t c)
 	HAL_IncCmdPointer(8);
 }
 
-void EVE_CMD_SWAP(void)
+void EVE_CMD_SWAP()
 {
 	HAL_Write32(EVE_ENC_CMD_SWAP);
 	HAL_IncCmdPointer(4);
@@ -728,7 +728,7 @@ void EVE_CMD_TRANSLATE(int32_t tx, int32_t ty)
 	HAL_IncCmdPointer(12);
 }
 
-void EVE_CMD_STOP(void)
+void EVE_CMD_STOP()
 {
 	HAL_Write32(EVE_ENC_CMD_STOP);
 	HAL_IncCmdPointer(4);
@@ -891,7 +891,7 @@ void EVE_CMD_SETFONT(uint32_t font, uint32_t ptr)
 	HAL_IncCmdPointer(12);
 }
 
-void EVE_CMD_LOGO(void)
+void EVE_CMD_LOGO()
 {
 	HAL_Write32(EVE_ENC_CMD_LOGO);
 	HAL_IncCmdPointer(4);
@@ -941,7 +941,7 @@ void EVE_CMD_GRADIENT(int16_t x0, int16_t y0, uint32_t rgb0, int16_t x1, int16_t
 	HAL_IncCmdPointer(20);
 }
 
-void EVE_CMD_SETMATRIX(void)
+void EVE_CMD_SETMATRIX()
 {
 	HAL_Write32(EVE_ENC_CMD_SETMATRIX);
 	HAL_IncCmdPointer(4);
@@ -974,7 +974,7 @@ void EVE_CMD_PROGRESS(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t optio
 	HAL_IncCmdPointer(20);
 }
 
-void EVE_CMD_COLDSTART(void)
+void EVE_CMD_COLDSTART()
 {
 	HAL_Write32(EVE_ENC_CMD_COLDSTART);
 	HAL_IncCmdPointer(4);
@@ -997,7 +997,7 @@ void EVE_CMD_LOADIMAGE(uint32_t ptr, uint32_t options)
 	HAL_IncCmdPointer(12);
 }
 
-void EVE_CMD_DLSTART(void)
+void EVE_CMD_DLSTART()
 {
 	HAL_Write32(EVE_ENC_CMD_DLSTART);
 	HAL_IncCmdPointer(4);
@@ -1010,7 +1010,7 @@ void EVE_CMD_SNAPSHOT(uint32_t ptr)
 	HAL_IncCmdPointer(8);
 }
 
-void EVE_CMD_SCREENSAVER(void)
+void EVE_CMD_SCREENSAVER()
 {
 	HAL_Write32(EVE_ENC_CMD_SCREENSAVER);
 	HAL_IncCmdPointer(4);
@@ -1192,7 +1192,7 @@ void EVE_VERTEX_TRANSLATE_Y(uint32_t y)
 	HAL_IncCmdPointer(4);
 }
 
-void EVE_NOP(void)
+void EVE_NOP()
 {
 	HAL_Write32(EVE_ENC_NOP());
 	HAL_IncCmdPointer(4);
@@ -1243,7 +1243,7 @@ void EVE_CMD_INT_SWLOADIMAGE(uint32_t ptr, uint32_t options)
 	HAL_IncCmdPointer(12);
 }
 
-void EVE_CMD_SYNC(void)
+void EVE_CMD_SYNC()
 {
 	HAL_Write32(EVE_ENC_CMD_SYNC);
 	HAL_IncCmdPointer(4);
@@ -1274,7 +1274,7 @@ void EVE_CMD_VIDEOFRAME(uint32_t dst, uint32_t ptr)
 	HAL_IncCmdPointer(12);
 }
 
-void EVE_CMD_VIDEOSTART(void)
+void EVE_CMD_VIDEOSTART()
 {
 	HAL_Write32(EVE_ENC_CMD_VIDEOSTART);
 	HAL_IncCmdPointer(4);
@@ -1872,10 +1872,10 @@ void EVE_CMD_CSKETCH(int16_t x, int16_t y, uint16_t w, uint16_t h, uint32_t ptr,
 //
 //
 //
-//Flash_Cmd_Status_t Gpu_CoCmd_FlashHelper_Write(Gpu_Hal_Context_t *phost, uint32_t dest_flash, uint32_t num, uint8_t *write_data)
+//Flash_Cmd_Status_t Gpu_CoCmd_FlashHelper_Write(Gpu_Hal_Context_t *phost, uint32_t dest_flash, uint32_t num, uint8_t *WriteData)
 //{
 //	uint32_t i;
-//	uint8_t padding_arr[FLASH_WRITE_ALIGN_BYTE]; /* write_data must be 256-byte aligned */
+//	uint8_t padding_arr[FLASH_WRITE_ALIGN_BYTE]; /* WriteData must be 256-byte aligned */
 //	uint32_t aligned_length = num % FLASH_WRITE_ALIGN_BYTE;
 //
 //	if (dest_flash % FLASH_WRITE_ALIGN_BYTE != 0) /* Check aligned address */
@@ -1884,26 +1884,26 @@ void EVE_CMD_CSKETCH(int16_t x, int16_t y, uint16_t w, uint16_t h, uint32_t ptr,
 //	}
 //
 //
-//	if (aligned_length == 0) /* write_data is already aligned */
+//	if (aligned_length == 0) /* WriteData is already aligned */
 //	{
-//		Gpu_CoCmd_FlashWriteExt(phost, dest_flash, num, write_data);
+//		Gpu_CoCmd_FlashWriteExt(phost, dest_flash, num, WriteData);
 //		App_Flush_Co_Buffer(phost);
 //		Gpu_Hal_WaitCmdfifo_empty(phost);
 //	}
 //	else
 //	{
-//		/* Write first aligned chunks of write_data */
+//		/* Write first aligned chunks of WriteData */
 //		if (num - aligned_length > 0){
-//			Gpu_CoCmd_FlashWriteExt(phost, dest_flash, num - aligned_length, write_data);
+//			Gpu_CoCmd_FlashWriteExt(phost, dest_flash, num - aligned_length, WriteData);
 //			App_Flush_Co_Buffer(phost);
 //			Gpu_Hal_WaitCmdfifo_empty(phost);
 //		}
-//		/* Write the rest write_data */
-//		write_data = write_data + num - aligned_length;
+//		/* Write the rest WriteData */
+//		WriteData = WriteData + num - aligned_length;
 //		for (i = 0; i < FLASH_WRITE_ALIGN_BYTE; i++)
 //		{
 //			if (i < aligned_length) {
-//				padding_arr[i] = *write_data++;
+//				padding_arr[i] = *WriteData++;
 //			}
 //			else {
 //				padding_arr[i] = 0xFF; /* Should use 0xFF instead of 0x00 to avoid writing overhead */

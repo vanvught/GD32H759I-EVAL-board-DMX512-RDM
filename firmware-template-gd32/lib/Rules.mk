@@ -20,11 +20,13 @@ SRCDIR=src src/gd32 $(EXTRA_SRCDIR)
 DEFINES:=$(addprefix -D,$(DEFINES))
 DEFINES+=-D_TIME_STAMP_YEAR_=$(shell date  +"%Y") -D_TIME_STAMP_MONTH_=$(shell date  +"%-m") -D_TIME_STAMP_DAY_=$(shell date  +"%-d")
 
-include ../firmware-template-gd32/Board.mk
-include ../firmware-template-gd32/Mcu.mk
-include ../firmware-template-gd32/Includes.mk
-include ../firmware-template-gd32/Artnet.mk
-include ../firmware-template-gd32/Validate.mk
+include ../common/make/gd32/Board.mk
+include ../common/make/gd32/Mcu.mk
+include ../common/make/DmxNodeNodeType.mk
+include ../common/make/DmxNodeOutputType.mk
+include ../common/make/gd32/Includes.mk
+include ../common/make/Artnet.mk
+include ../common/make/gd32/Validate.mk
 
 INCLUDES+=-I../lib-configstore/include -I../lib-device/include -I../lib-display/include -I../lib-flash/include -I../lib-flashcode/include -I../lib-hal/include -I../lib-lightset/include -I../lib-network/include
 
@@ -82,7 +84,7 @@ all : builddirs $(TARGET)
 
 builddirs:
 	mkdir -p $(BUILD_DIRS)
-	mkdir -p $(EXTRA_BUILD_DIRS)
+	if [[ -n "${EXTRA_BUILD_DIRS}" ]]; then mkdir -p $(EXTRA_BUILD_DIRS); fi
 	mkdir -p lib_gd32
 
 clean:

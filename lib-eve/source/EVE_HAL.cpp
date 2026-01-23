@@ -1,5 +1,5 @@
 /**
- @file EVE_HAL.c
+ @file EVE_HAL.cpp
  */
 /*
  * ============================================================================
@@ -57,15 +57,15 @@
 #include "HAL.h"
 #include "MCU.h"
 
-#include "debug.h"
+ #include "firmware/debug/debug_debug.h"
 
 // Used to navigate command ring buffer
 static uint16_t writeCmdPointer = 0x0000;
 
 
-void HAL_EVE_Init(void)
+void HAL_EVE_Init()
 {
-	DEBUG_ENTRY
+	DEBUG_ENTRY();
 
 	uint8_t val;
 	MCU_Init();
@@ -125,7 +125,7 @@ void HAL_EVE_Init(void)
 	// This function will not return unless an EVE device is present.
 	MCU_Setup();
 
-	DEBUG_EXIT
+	DEBUG_EXIT();
 }
 
 // --------------------- Chip Select line ----------------------------------
@@ -198,7 +198,7 @@ void HAL_Write8(uint8_t val8)
 }
 
 // ------------------------ Read a 32-bit data value --------------------------
-uint32_t HAL_Read32(void)
+uint32_t HAL_Read32()
 {    
 	// Read 4 bytes from a register has been previously addressed. Send dummy
 	// 00 bytes as only the incoming value is important.
@@ -212,7 +212,7 @@ uint32_t HAL_Read32(void)
 }
 
 // ------------------------ Read a 16-bit data value ---------------------------
-uint16_t HAL_Read16(void)
+uint16_t HAL_Read16()
 {
 	// Read 2 bytes from a register has been previously addressed. Send dummy
 	// 00 bytes as only the incoming value is important.
@@ -226,7 +226,7 @@ uint16_t HAL_Read16(void)
 }
 
 // ------------------------ Read an 8-bit data value ---------------------------
-uint8_t HAL_Read8(void)
+uint8_t HAL_Read8()
 {
 	// Read 1 byte from a register has been previously addressed. Send dummy
 	// 00 byte as only the incoming value is important.
@@ -359,20 +359,20 @@ void HAL_IncCmdPointer(uint16_t commandSize)
 }
 
 // --------- Increment co-processor address offset counter --------------------
-uint16_t HAL_GetCmdPointer(void)
+uint16_t HAL_GetCmdPointer()
 {
 	// Return new offset
 	return writeCmdPointer;
 }
 
-void HAL_WriteCmdPointer(void)
+void HAL_WriteCmdPointer()
 {
 	// and move write pointer to here
 	HAL_MemWrite32(EVE_REG_CMD_WRITE, writeCmdPointer);
 }
 
 // ------ Wait for co-processor read and write pointers to be equal ------------
-uint8_t HAL_WaitCmdFifoEmpty(void)
+uint8_t HAL_WaitCmdFifoEmpty()
 {
 	uint32_t readCmdPointer;
 
@@ -397,7 +397,7 @@ uint8_t HAL_WaitCmdFifoEmpty(void)
 	}
 }
 // ------------ Check how much free space is available in CMD FIFO -------------
-uint16_t HAL_CheckCmdFreeSpace(void)
+uint16_t HAL_CheckCmdFreeSpace()
 {
 	uint32_t readCmdPointer = 0;
 	uint16_t Fullness, Freespace;

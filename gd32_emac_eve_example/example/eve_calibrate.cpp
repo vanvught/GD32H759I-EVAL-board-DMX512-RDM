@@ -1,5 +1,5 @@
 /**
- @file eve_calibrate.c
+ @file eve_calibrate.cpp
  */
 /*
  * ============================================================================
@@ -54,7 +54,7 @@
 
 #include "eve_example.h"
 
-#include "debug.h"
+#include "firmware/debug/debug_debug.h"
 
 /* CONSTANTS ***********************************************************************/
 
@@ -71,7 +71,7 @@
 
 void eve_calibrate(void)
 {
-	DEBUG_ENTRY
+	DEBUG_ENTRY();
 
 	struct touchscreen_calibration calib;
 	uint8_t dummy;
@@ -119,5 +119,5 @@ void eve_calibrate(void)
 		HAL_MemWrite32(EVE_REG_TOUCH_TRANSFORM_F, calib.transform[5]);
 	}
 
-	DEBUG_EXIT
+	DEBUG_EXIT();
 }

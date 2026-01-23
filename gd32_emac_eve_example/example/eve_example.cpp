@@ -1,5 +1,5 @@
 /**
- @file eve_example.c
+ @file eve_example.cpp
  */
 /*
  * ============================================================================
@@ -59,7 +59,8 @@
 extern const uint8_t font0[];
 const EVE_GPU_FONT_HEADER *font0_hdr = (const EVE_GPU_FONT_HEADER *)font0;
 
-#include "debug.h"
+#include "firmware/debug/debug_printbits.h"
+#include "firmware/debug/debug_debug.h"
 
 static uint32_t counter;
 static time_t t1;
@@ -67,7 +68,7 @@ static char timeString[32];
 static bool doRefresh;
 
 void eve_display() {
-	DEBUG_ENTRY
+	DEBUG_ENTRY();
 
 	EVE_LIB_BeginCoProList();
 	EVE_CMD_DLSTART();
@@ -116,15 +117,15 @@ void eve_display() {
 	EVE_LIB_EndCoProList();
 	EVE_LIB_AwaitCoProEmpty();
 
-	DEBUG_EXIT
+	DEBUG_EXIT();
 }
 
 static uint8_t key;
 
 void eve_example_run() {
-	if (__builtin_expect(FUNC_PREFIX(gpio_lev(FT8XX_LCD_INT_GPIO)) == LOW, 0)) {
+	if (__builtin_expect(FUNC_PREFIX(GpioLev(FT8XX_LCD_INT_GPIO)) == 0, 0)) {
 		const auto nFlags = HAL_MemRead8(EVE_REG_INT_FLAGS);
-		debug_print_bits(nFlags);
+		debug::PrintBits(nFlags);
 		if ((nFlags & (1U << 1)) == (1U << 1)) {
 		}
 	}

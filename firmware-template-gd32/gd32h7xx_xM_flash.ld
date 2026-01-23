@@ -76,6 +76,8 @@ SECTIONS
     *(.text.*Dmx*)
     *(.text.*lightset*)
     
+    *(.text.*main*)
+    
     . = ALIGN(8);
     _eitcmram = .;
   } >ITCMRAM AT> FLASH
@@ -173,16 +175,16 @@ SECTIONS
   .bss :
   {
     . = ALIGN(4);
-    _sbss = . ;
+    _sbss = .;
     __bss_start__ = _sbss;
     *(.bss)
     *(.bss*)
     *(COMMON)
     . = ALIGN(4);
-    _ebss = . ;
+    _ebss = .;
     __bss_end__ = _ebss;
   } >RAM
-  
+
   . = ALIGN(8);
   PROVIDE ( end = _ebss );
   PROVIDE ( _end = _ebss );

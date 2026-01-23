@@ -1,4 +1,4 @@
-DEFINES =LIGHTSET_PORTS=2
+DEFINES =DMXNODE_PORTS=2
 
 DEFINES+=NODE_ARTNET_MULTI ARTNET_VERSION=4
 DEFINES+=ARTNET_HAVE_DMXIN
@@ -44,5 +44,6 @@ LIBS=
 SRCDIR=firmware lib
 
 include ../firmware-template-gd32/Rules.mk
+
 
 prerequisites:

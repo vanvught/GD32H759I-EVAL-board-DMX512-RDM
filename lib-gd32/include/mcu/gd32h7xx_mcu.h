@@ -26,7 +26,7 @@
 #ifndef MCU_GD32H7XX_MCU_H_
 #define MCU_GD32H7XX_MCU_H_
 
-#if !defined(MCU_GD32H759_MCU_H_)
+#if !(defined(MCU_GD32H757_MCU_H_) || defined(MCU_GD32H759_MCU_H_))
 # error This file should not be included
 #endif
 
@@ -41,6 +41,7 @@
 # define USART0_GPIOx			GPIOB
 # define USART0_TX_GPIO_PINx	GPIO_PIN_6
 # define USART0_RX_GPIO_PINx	GPIO_PIN_7
+#elif defined(USART0_REMAP_CUSTOM)
 #else
 # define USART0_GPIO_AFx		GPIO_AF_7
 # define USART0_RCU_GPIOx		RCU_GPIOA

@@ -25,40 +25,40 @@
 
 #include "hal_gpio.h"
 #include "hal_spi.h"
-
-#include "debug.h"
+#include "firmware/debug/debug_printbits.h"
+ #include "firmware/debug/debug_debug.h"
 
 void MCU_Init() {
-	DEBUG_ENTRY
+	DEBUG_ENTRY();
 
-	FUNC_PREFIX(spi_begin());
-	FUNC_PREFIX(spi_chipSelect(SPI_CS_NONE));
-	FUNC_PREFIX(spi_set_speed_hz(1000000));
-	FUNC_PREFIX(spi_setDataMode(SPI_MODE0));
+	FUNC_PREFIX(SpiBegin());
+	FUNC_PREFIX(SpiChipSelect(SPI_CS_NONE));
+	FUNC_PREFIX(SpiSetSpeedHz(1000000));
+	FUNC_PREFIX(SpiSetDataMode(SPI_MODE0));
 
-	FUNC_PREFIX(gpio_fsel(FT8XX_LCD_CS_GPIO, GPIO_FSEL_OUTPUT));
-	FUNC_PREFIX(gpio_fsel(FT8XX_LCD_DC_GPIO, GPIO_FSEL_OUTPUT));
+	FUNC_PREFIX(GpioFsel(FT8XX_LCD_CS_GPIO, GPIO_FSEL_OUTPUT));
+	FUNC_PREFIX(GpioFsel(FT8XX_LCD_DC_GPIO, GPIO_FSEL_OUTPUT));
 
-	FUNC_PREFIX(gpio_fsel(FT8XX_LCD_INT_GPIO, GPIO_FSEL_INPUT));
-	FUNC_PREFIX(gpio_set_pud(FT8XX_LCD_INT_GPIO, GPIO_PULL_UP));
+	FUNC_PREFIX(GpioFsel(FT8XX_LCD_INT_GPIO, GPIO_FSEL_INPUT));
+	FUNC_PREFIX(GpioSetPud(FT8XX_LCD_INT_GPIO, GPIO_PULL_UP));
 
-	FUNC_PREFIX(gpio_set(FT8XX_LCD_CS_GPIO));
-	FUNC_PREFIX(gpio_set(FT8XX_LCD_DC_GPIO));
+	FUNC_PREFIX(GpioSet(FT8XX_LCD_CS_GPIO));
+	FUNC_PREFIX(GpioSet(FT8XX_LCD_DC_GPIO));
 
-	DEBUG_EXIT
+	DEBUG_EXIT();
 }
 
 #include "EVE.h"
 #include "HAL.h"
 
 void MCU_Setup() {
-	DEBUG_ENTRY
+	DEBUG_ENTRY();
 
 	HAL_MemWrite8(EVE_REG_INT_EN, 1);
 	// TOUCH, TAG and CMDEMPTY
 	const auto nMask = static_cast<uint8_t>((1U << 1) | (1U << 2) | (1U << 5));
-	debug_print_bits(nMask);
+	debug::PrintBits(nMask);
 	HAL_MemWrite8(EVE_REG_INT_MASK, nMask);
 
-	DEBUG_EXIT
+	DEBUG_EXIT();
 }

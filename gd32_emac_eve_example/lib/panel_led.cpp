@@ -1,5 +1,5 @@
 /**
- * @file panel_cpp
+ * @file panel_led.cpp
  *
  */
 /* Copyright (C) 2021-2023 by Arjan van Vught mailto:info@gd32-dmx.org

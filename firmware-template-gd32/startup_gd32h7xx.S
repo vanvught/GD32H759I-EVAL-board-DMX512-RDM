@@ -90,6 +90,7 @@ CopyITCM:
   bx lr
 /* NOP to align the code (optional) */
   nop                        /* No operation; used for code alignment and readability */
+  nop
 
 .size Reset_Handler, .-Reset_Handler
 

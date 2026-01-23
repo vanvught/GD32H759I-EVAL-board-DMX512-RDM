@@ -9,25 +9,31 @@ else
 endif	
 
 ifeq ($(findstring NODE_ARTNET,$(DEFINES)),NODE_ARTNET)
-	ARTNET=1
-	ifeq ($(findstring ARTNET_VERSION=3,$(DEFINES)),ARTNET_VERSION=3)
-	else
-		E131=1
-	endif
+  	ARTNET=1
+  	DMXNODE=1
+  	ifeq ($(findstring ARTNET_VERSION=3,$(DEFINES)),ARTNET_VERSION=3)
+  	else
+  		E131=1
+  	endif
 endif
-
+  
 ifeq ($(findstring NODE_E131,$(DEFINES)),NODE_E131)
-	ifneq ($(findstring e131,$(LIBS)),e131)
-		E131=1
-	endif
+  	ifneq ($(findstring e131,$(LIBS)),e131)
+  		E131=1
+  		DMXNODE=1
+  	endif
 endif
-
+  
+ifdef DMXNODE
+  	LIBS+=dmxnode
+endif
+  
 ifdef ARTNET
-	LIBS+=artnet
+  	LIBS+=artnet
 endif
-
+  
 ifdef E131
-	LIBS+=e131
+  	LIBS+=e131
 endif
 
 ifeq ($(findstring NODE_SHOWFILE,$(DEFINES)),NODE_SHOWFILE)
@@ -98,7 +104,7 @@ ifeq ($(findstring OUTPUT_DMX_PCA9685,$(DEFINES)),OUTPUT_DMX_PCA9685)
 endif
 
 ifeq ($(findstring OUTPUT_DMX_TLC59711,$(DEFINES)),OUTPUT_DMX_TLC59711)
-	LIBS+=tlc59711dmx tlc59711
+	LIBS+=dmxled tlc59711dmx tlc59711
 endif
 
 ifeq ($(findstring OUTPUT_DMX_ARTNET,$(DEFINES)),OUTPUT_DMX_ARTNET)
@@ -109,12 +115,12 @@ ifeq ($(findstring OUTPUT_DMX_SERIAL,$(DEFINES)),OUTPUT_DMX_SERIAL)
 	LIBS+=dmxserial
 endif
 
-LIBS+=network configstore flashcode properties
+LIBS+=network configstore flashcode
 
 ifeq ($(findstring DISPLAY_UDF,$(DEFINES)),DISPLAY_UDF)
 	LIBS+=displayudf
 endif
 
-LIBS+=display lightset device hal
+LIBS+=display device hal
 
 $(info $$LIBS [${LIBS}])

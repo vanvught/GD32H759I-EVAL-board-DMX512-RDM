@@ -21,14 +21,21 @@ FIRMWARE_DIR=./../firmware-template-gd32/
 
 DEFINES:=$(addprefix -D,$(DEFINES))
 
-include ../firmware-template-gd32/Board.mk
-include ../firmware-template-gd32/Mcu.mk
+include ../common/make/gd32/Board.mk
+include ../common/make/gd32/Mcu.mk
 include ../firmware-template/libs.mk
-include ../firmware-template-gd32/Includes.mk
-include ../firmware-template-gd32/Artnet.mk
-include ../firmware-template-gd32/Validate.mk
+include ../common/make/DmxNodeNodeType.mk
+include ../common/make/DmxNodeOutputType.mk
+include ../common/make/gd32/Includes.mk
+include ../common/make/Artnet.mk
+include ../common/make/gd32/mbedtls.mk
+include ../common/make/gd32/Validate.mk
 
 LIBS+=gd32 clib
+
+ifeq ($(findstring NODE_SHOWFILE,$(DEFINES)),NODE_SHOWFILE)
+	LIBS+=showfile
+endif
 
 # The variable for the libraries include directory
 LIBINCDIRS:=$(addprefix -I../lib-,$(LIBS))
