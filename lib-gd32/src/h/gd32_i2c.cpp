@@ -2,7 +2,7 @@
  * @file gd32_i2c.cpp
  *
  */
-/* Copyright (C) 2024-2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -248,12 +248,12 @@ uint8_t Gd32I2cWrite(const char* pBuffer, uint32_t nLength)
             }
             break;
             default:
-                assert(0);
+                assert(false && "Invalid state");
                 break;
         }
     }
 
-    assert(0);
+    assert(false && "GD32_I2C_NOK");
     return GD32_I2C_NOK;
 }
 
@@ -413,12 +413,12 @@ uint8_t Gd32I2cRead(char* pBuffer, uint32_t nLength)
             }
             break;
             default:
-                assert(0);
+                assert(false && "Invalid state");
                 break;
         }
     }
 
-    assert(0);
+    assert(false && "GD32_I2C_NOK");
     return GD32_I2C_NOK;
 }
 

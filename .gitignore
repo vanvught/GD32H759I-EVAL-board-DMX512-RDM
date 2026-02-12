@@ -44,3 +44,4 @@
 
 udp_send
 /gd32_emac_debug_ntp-ptp
+/common/scripts/gd32/venv
