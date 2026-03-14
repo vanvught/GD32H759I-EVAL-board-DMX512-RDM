@@ -113,7 +113,7 @@ int main()
     Display display;
     ConfigStore config_store;
     network::Init();
-    FirmwareVersion fw(SOFTWARE_VERSION, __DATE__, __TIME__);
+    FirmwareVersion fw(kSoftwareVersion, __DATE__, __TIME__);
 
     fw.Print("EVE Example");
 
