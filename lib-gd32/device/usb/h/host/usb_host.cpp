@@ -182,7 +182,7 @@ void usb_init() {
 	usb_gpio_config();
 	usb_rcu_config();
 	usb_vbus_config();
-	usbh_class_register(&usb_host_msc, &usbh_msc);
+	usbh_class_register(&usb_host, &usbh_msc);
 #ifdef USE_USBHS0
 # ifdef USE_USB_FS
     usb_para_init (&usbh_core, USBHS0, USB_SPEED_FULL);
@@ -199,7 +199,7 @@ void usb_init() {
 	usb_para_init(&usbh_core, USBHS1, USB_SPEED_HIGH);
 # endif
 #endif /* USE_USBHS1 */
-	usbh_init(&usb_host_msc, &usbh_core, &usr_cb);
+	usbh_init(&usb_host, &usbh_core, &usr_cb);
 #ifdef USE_USB_HS
 # ifndef USE_ULPI_PHY
 #  ifdef USE_USBHS0
