@@ -31,7 +31,9 @@ ifneq ($(MAKE_FLAGS),)
   		EXTRA_C_SOURCE_FILES+=gd32f20x/GD32F20x_usbfs_library/driver/Source/drv_usbh_int.c
   		
   		ifeq ($(findstring CONFIG_USB_HOST_MSC,$(MAKE_FLAGS)), CONFIG_USB_HOST_MSC)
-  			EXTRA_SRCDIR+=gd32f20x/GD32F20x_usbfs_library/host/class/msc/Source
+  		  EXTRA_C_SOURCE_FILES+=gd32f20x/GD32F20x_usbfs_library/host/class/msc/Source/usbh_msc_bbb.c
+  			EXTRA_C_SOURCE_FILES+=gd32f20x/GD32F20x_usbfs_library/host/class/msc/Source/usbh_msc_core.c
+  			EXTRA_C_SOURCE_FILES+=gd32f20x/GD32F20x_usbfs_library/host/class/msc/Source/usbh_msc_scsi.c
   			EXTRA_SRCDIR+=device/usb/host/msc
   		endif
   	endif
@@ -55,8 +57,11 @@ ifneq ($(MAKE_FLAGS),)
     	EXTRA_C_SOURCE_FILES+=gd32f4xx/GD32F4xx_usb_library/driver/Source/drv_usb_host.c
     	EXTRA_C_SOURCE_FILES+=gd32f4xx/GD32F4xx_usb_library/driver/Source/drv_usbh_int.c
       		
-  		ifeq ($(findstring CONFIG_USB_HOST_MSC,$(MAKE_FLAGS)), CONFIG_USB_HOST_MSC)
-  			EXTRA_SRCDIR+=gd32f4xx/GD32F4xx_usb_library/host/class/msc/Source
+			ifeq ($(findstring CONFIG_USB_HOST_MSC,$(MAKE_FLAGS)), CONFIG_USB_HOST_MSC)
+  			EXTRA_C_SOURCE_FILES+=gd32f4xx/GD32F4xx_usb_library/host/class/msc/Source/usbh_msc_bbb.c
+  			EXTRA_C_SOURCE_FILES+=gd32f4xx/GD32F4xx_usb_library/host/class/msc/Source/usbh_msc_core.c
+  	  		EXTRA_C_SOURCE_FILES+=gd32f4xx/GD32F4xx_usb_library/host/class/msc/Source/usbh_msc_scsi.c
+  			EXTRA_SRCDIR+=device/usb/host/msc
   		endif
   	endif
   	
@@ -82,8 +87,10 @@ ifneq ($(MAKE_FLAGS),)
     		EXTRA_C_SOURCE_FILES+=gd32h7xx/GD32H7xx_usbhs_library/driver/Source/drv_usbh_int.c 
 	  	 	
 	  	 	ifeq ($(findstring CONFIG_USB_HOST_MSC,$(MAKE_FLAGS)), CONFIG_USB_HOST_MSC)
+	  	 		EXTRA_C_SOURCE_FILES+=gd32h7xx/GD32H7xx_usbhs_library/host/class/msc/Source/usbh_msc_bbb.c
+	  	 		EXTRA_C_SOURCE_FILES+=gd32h7xx/GD32H7xx_usbhs_library/host/class/msc/Source/usbh_msc_core.c
+	  	 		EXTRA_C_SOURCE_FILES+=gd32h7xx/GD32H7xx_usbhs_library/host/class/msc/Source/usbh_msc_scsi.c
 	  	 		EXTRA_SRCDIR+=device/usb/host/msc
-	  	 		EXTRA_SRCDIR+=gd32h7xx/GD32H7xx_usbhs_library/host/class/msc/Source
 	  	 	endif
   		endif
 		GD32=H
