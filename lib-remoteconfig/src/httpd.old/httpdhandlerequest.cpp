@@ -80,7 +80,7 @@
 
 #include "debug.h"
 
-#if defined ENABLE_CONTENT
+#if defined
 const char* get_file_content(const char* fileName, uint32_t& nSize, http::contentTypes& contentType);
 #endif
 
