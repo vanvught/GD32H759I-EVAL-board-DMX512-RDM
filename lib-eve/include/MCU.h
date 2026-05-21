@@ -57,6 +57,7 @@
 
 #include "hal_gpio.h"
 #include "hal_spi.h"
+#include "timing.h"
 
 /**
  @brief MCU specific initialisation
@@ -239,7 +240,7 @@ inline void MCU_SPIWrite32(const uint32_t DataToWrite) {
  	 power down of the EVE for a controlled minimum period of time.
  */
 inline void MCU_Delay_20ms() {
-	udelay(20 * 1000);
+	timing::DelayUs(20 * 1000);
 }
 
 /**
@@ -249,7 +250,7 @@ inline void MCU_Delay_20ms() {
  	 power down of the EVE for a controlled minimum period of time.
  */
 inline void MCU_Delay_500ms() {
-	udelay(500 * 1000);
+	timing::DelayUs(500 * 1000);
 }
 
 /**
