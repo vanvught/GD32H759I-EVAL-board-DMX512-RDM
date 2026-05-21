@@ -1,8 +1,8 @@
 /**
- * @file network_display.cpp
+ * @file emac_phy.cpp
  *
  */
-/* Copyright (C) 2021-2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2023-2025 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,68 +23,43 @@
  * THE SOFTWARE.
  */
 
-#include "displayudf.h"
-#include "core/protocol/dhcp.h"
+#include <cstdint>
 
-namespace net::emac::display
-{
-void Config()
-{
-    DisplayUdf::Get()->ShowEmacInit();
-}
+#include "emac/emac_phy.h"
+#include "firmware/debug/debug_debug.h"
 
-void Start()
-{
-    DisplayUdf::Get()->ShowEmacStart();
-}
-void Status(bool is_link_up)
-{
-    DisplayUdf::Get()->ShowEmacStatus(is_link_up);
-}
-} // namespace net::emac::display
+#if !defined(BIT)
+#define BIT(x) static_cast<uint16_t>(1U << (x))
+#endif
 
-namespace network::display
-{
-void Hostname()
-{
-    DisplayUdf::Get()->ShowHostName();
+#if !defined(PHY_ADDRESS)
+#define PHY_ADDRESS 1
+#endif
+
+namespace emac::phy {
+void CustomizedLed() {
+    DEBUG_ENTRY();
+
+    DEBUG_EXIT();
 }
 
-void EmacShutdown()
-{
-    DisplayUdf::Get()->ShowShutdown();
+void CustomizedTiming() {
+    DEBUG_ENTRY();
+
+    DEBUG_EXIT();
 }
 
-void DhcpStatus(network::dhcp::State state)
-{
-    DisplayUdf::Get()->ShowDhcpStatus(state);
-}
-} // namespace network::display
+/**
+ * PHY Status Register (PHYSTS), address 10h
+ * @param phyStatus
+ */
+void CustomizedStatus(phy::Status& phy_status) {
+    uint16_t value;
+    phy::Read(PHY_ADDRESS, 0x10, value);
 
-namespace network::event
-{
-void LinkUp()
-{
-    DisplayUdf::Get()->ShowIpAddress();
+    phy_status.link = ((value & BIT(0)) == BIT(0)) ? phy::Link::kStateUp : phy::Link::kStateDown;
+    phy_status.duplex = ((value & BIT(2)) == BIT(2)) ? phy::Duplex::kDuplexFull : phy::Duplex::kDuplexHalf;
+    phy_status.speed = ((value & BIT(1)) == BIT(1)) ? phy::Speed::kSpeed10 : phy::Speed::kSpeed100;
+    phy_status.autonegotiation = ((value & BIT(4)) == BIT(4));
 }
-
-void LinkDown()
-{
-    DisplayUdf::Get()->ShowEmacStatus(false);
-}
-
-void Ipv4AddressChanged()
-{
-    DisplayUdf::Get()->ShowIpAddress();
-}
-
-void Ipv4NetmaskChanged()
-{
-    DisplayUdf::Get()->ShowNetmask();
-}
-
-void Ipv4GatewayChanged()
-{
-    DisplayUdf::Get()->ShowGatewayIp();
-}
-} // namespace network::event
+} // namespace emac::phy

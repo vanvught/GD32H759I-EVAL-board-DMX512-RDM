@@ -1,8 +1,8 @@
 /**
- * @file net_link_check.h
+ * @file emac_link.cpp
  *
  */
-/* Copyright (C) 2022-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2023-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,28 +23,40 @@
  * THE SOFTWARE.
  */
 
-#ifndef EMAC_NET_LINK_CHECK_H_
-#define EMAC_NET_LINK_CHECK_H_
+#include "emac/emac_link_check.h"
+#include "emac/emac_phy.h"
+#include "emac/mmi.h"
+#include "firmware/debug/debug_debug.h"
 
-#include "phy.h"
+#define PHY_REG_MICR 0x11U
+#define PHY_REG_MISR 0x12U
+#define PHY_INT_AND_OUTPUT_ENABLE 0x03U
+#define PHY_LINK_INT_ENABLE 0x20U
 
-namespace net::link
-{
-net::phy::Link StatusRead();
-void HandleChange(net::phy::Link state);
-// Platform defined implementations
-// #if defined(ENET_LINK_CHECK_USE_INT) || defined(ENET_LINK_CHECK_USE_PIN_POLL)
-void GpioInit();
-void PinEnable();
-void PinRecovery();
-// #endif
-// #if defined(ENET_LINK_CHECK_USE_INT)
-void ExtiInit();
-void InterruptInit();
-// #elif defined(ENET_LINK_CHECK_USE_PIN_POLL)
-void PinPollInit();
-void PinPoll();
-// #endif
-} // namespace net::link
+#if !defined(PHY_ADDRESS)
+#define PHY_ADDRESS 1
+#endif
 
-#endif // EMAC_NET_LINK_CHECK_H_
+namespace emac::link {
+#if defined(ENET_LINK_CHECK_USE_INT) || defined(ENET_LINK_CHECK_USE_PIN_POLL)
+void PinEnable() {
+    uint16_t phy_value = PHY_INT_AND_OUTPUT_ENABLE;
+    phy::Write(PHY_ADDRESS, PHY_REG_MICR, phy_value);
+
+    phy::Read(PHY_ADDRESS, PHY_REG_MICR, phy_value);
+
+    if (PHY_INT_AND_OUTPUT_ENABLE != phy_value) {
+        DEBUG_PUTS("PHY_INT_AND_OUTPUT_ENABLE != phy_value");
+    }
+
+    phy_value = PHY_LINK_INT_ENABLE;
+    phy::Write(PHY_ADDRESS, PHY_REG_MISR, phy_value);
+}
+
+void PinRecovery() {
+    uint16_t phy_value;
+    phy::Read(PHY_ADDRESS, PHY_REG_MISR, phy_value);
+    phy::Read(PHY_ADDRESS, mmi::REG_BMSR, phy_value);
+}
+#endif
+} // namespace emac::link
