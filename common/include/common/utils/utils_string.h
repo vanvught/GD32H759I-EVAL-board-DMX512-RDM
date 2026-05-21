@@ -1,8 +1,8 @@
-/*
- * display.h
+/**
+ * @file utils_string.h
  *
  */
-/* Copyright (C) 2025-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,33 +23,22 @@
  * THE SOFTWARE.
  */
 
-#ifndef COMMON_FIRMWARE_PIXELDMX_SHOW_H_
-#define COMMON_FIRMWARE_PIXELDMX_SHOW_H_
+#ifndef COMMON_UTILS_UTILS_STRING_H_
+#define COMMON_UTILS_UTILS_STRING_H_
 
 #include <cstdint>
 
-#include "pixeldmxconfiguration.h"
-#include "display.h"
-#include "pixelpatterns.h"
-
-namespace common::firmware::pixeldmx {
-inline void Show(uint32_t line, pixelpatterns::Pattern pattern = pixelpatterns::Pattern::kNone) {
-    auto& configuration = PixelDmxConfiguration::Get();
-    auto* display = Display::Get();
-    assert(display != nullptr);
-
-    display->ClearEndOfLine();
-    display->Printf(line, "%s:%d G%d %s", 
-		pixel::GetTypeName(configuration.GetType()), 
-		configuration.GetCount(), configuration.GetGroupingCount(), 
-		pixel::GetMapName(configuration.GetMap()));
-    display->ClearLine(8); // Status line
-
-    if (pattern != pixelpatterns::Pattern::kNone) {
-        display->ClearLine(6);
-        display->Printf(6, "%s:%u", PixelPatterns::GetName(pattern), static_cast<uint32_t>(pattern));
+namespace common
+{
+constexpr uint32_t ConstStrLen(const char* s)
+{
+    uint32_t len = 0;
+    while (s[len] != '\0')
+    {
+        ++len;
     }
+    return len;
 }
-} // namespace common::firmware::pixeldmx
+} // namespace common
 
-#endif // COMMON_FIRMWARE_PIXELDMX_SHOW_H_
+#endif // COMMON_UTILS_UTILS_STRING_H_
