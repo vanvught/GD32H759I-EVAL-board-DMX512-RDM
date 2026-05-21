@@ -28,12 +28,9 @@
 #include <cstring>
 #include <time.h>
 
-#include "gd32/hal_watchdog.h"
+#include "gd32/hal.h"
+#include "watchdog.h"
 #include "network.h"
-
-
-#include "apps/mdns.h"
-
 #include "displayudf.h"
 #include "json/displayudfparams.h"
 #include "displayhandler.h"
@@ -48,55 +45,52 @@
 #include "gd32_quadrature_decoder.h"
 
 namespace hal {
-void RebootHandler() {
-}
-}  // namespace hal
+void RebootHandler() {}
+} // namespace hal
 
 int main() {
-	hal::Init();
-	DisplayUdf display;
-	ConfigStore config_store;
-	network::Init();
-	FirmwareVersion fw(kSoftwareVersion, __DATE__, __TIME__);
+    hal::Init();
+    DisplayUdf display;
+    ConfigStore config_store;
+    network::Init();
+    FirmwareVersion fw(kSoftwareVersion, __DATE__, __TIME__);
 
-	fw.Print("Debug");
+    fw.Print("Debug");
 
-	display.SetTitle("Debug");
-	display.Set(2, displayudf::Labels::kHostname);
-	display.Set(3, displayudf::Labels::kIp);
-	display.Set(4, displayudf::Labels::kVersion);
-	display.Set(5, displayudf::Labels::kBoardname);
-	display.Set(6, displayudf::Labels::kNetmask);
+    display.SetTitle("Debug");
+    display.Set(2, displayudf::Labels::kHostname);
+    display.Set(3, displayudf::Labels::kIp);
+    display.Set(4, displayudf::Labels::kVersion);
+    display.Set(5, displayudf::Labels::kBoardname);
+    display.Set(6, displayudf::Labels::kNetmask);
 
-	json::DisplayUdfParams displayudf_params;
-	displayudf_params.Load();
-	displayudf_params.SetAndShow();
+    json::DisplayUdfParams displayudf_params;
+    displayudf_params.Load();
+    displayudf_params.SetAndShow();
 
+    RemoteConfig remote_config(remoteconfig::Output::CONFIG, 0);
 
-	RemoteConfig remote_config( remoteconfig::Output::CONFIG, 0);
+    watchdog::Init();
 
+    /*
+     *
+     */
 
-	hal::WatchdogInit();
+    gd32_quadrature_decoder_begin();
 
-	/*
-	 *
-	 */
+    for (;;) {
+        watchdog::Feed();
+        network::Run();
+        hal::Run();
+        /*
+         *
+         */
 
-	gd32_quadrature_decoder_begin();
+        uint32_t nCount;
+        uint32_t nDirection;
 
-	for (;;) {
-		hal::WatchdogFeed();
-		network::Run();
-		hal::Run();
-		/*
-		 *
-		 */
-
-		uint32_t nCount;
-		uint32_t nDirection;
-
-		if (gd32_quadrature_decoder_read(nCount, nDirection)) {
-//			printf("%u %u\n", nCount, nDirection);
-		}
-	}
+        if (gd32_quadrature_decoder_read(nCount, nDirection)) {
+            //			printf("%u %u\n", nCount, nDirection);
+        }
+    }
 }

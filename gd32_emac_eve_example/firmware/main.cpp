@@ -28,7 +28,7 @@
 #include <sys/time.h>
 
 #include "gd32/hal.h"
-#include "gd32/hal_watchdog.h"
+#include "watchdog.h"
 #include "network.h"
 #include "display.h"
 #include "remoteconfig.h"
@@ -44,23 +44,19 @@ const char* config_file = "config.bin";
 void eve_example_run();
 void eve_display();
 
-int8_t platform_calib_init(void)
-{
+int8_t platform_calib_init(void) {
     return 1;
 }
 
-int8_t platform_calib_write(struct touchscreen_calibration* calib)
-{
+int8_t platform_calib_write(struct touchscreen_calibration* calib) {
     DEBUG_ENTRY();
     FILE* h1;
 
-    if ((h1 = fopen(config_file, "w")) != NULL)
-    {
+    if ((h1 = fopen(config_file, "w")) != NULL) {
         const auto kLength = fwrite(calib, sizeof(struct touchscreen_calibration), 1, h1);
         fclose(h1);
 
-        if (kLength != sizeof(struct touchscreen_calibration))
-        {
+        if (kLength != sizeof(struct touchscreen_calibration)) {
             DEBUG_EXIT();
             return -1;
         }
@@ -73,18 +69,15 @@ int8_t platform_calib_write(struct touchscreen_calibration* calib)
     return -1;
 }
 
-int8_t platform_calib_read(struct touchscreen_calibration* calib)
-{
+int8_t platform_calib_read(struct touchscreen_calibration* calib) {
     DEBUG_ENTRY();
     FILE* h1;
 
-    if ((h1 = fopen(config_file, "r")) != NULL)
-    {
+    if ((h1 = fopen(config_file, "r")) != NULL) {
         const auto kLength = fread(calib, sizeof(struct touchscreen_calibration), 1, h1);
         fclose(h1);
 
-        if (kLength != sizeof(struct touchscreen_calibration))
-        {
+        if (kLength != sizeof(struct touchscreen_calibration)) {
             DEBUG_EXIT();
             return -1;
         }
@@ -97,18 +90,11 @@ int8_t platform_calib_read(struct touchscreen_calibration* calib)
     return -1;
 }
 
-namespace hal
-{
+namespace hal {
 void RebootHandler() {}
 } // namespace hal
 
-namespace hal
-{
-void Init();
-}
-
-int main()
-{
+int main() { // NOLINT
     hal::Init();
     Display display;
     ConfigStore config_store;
@@ -117,26 +103,24 @@ int main()
 
     fw.Print("EVE Example");
 
-    RemoteConfig remote_config( remoteconfig::Output::CONFIG, 0);
+    RemoteConfig remote_config(remoteconfig::Output::CONFIG, 0);
 
-
-    display.TextStatus("Initialize the display", console::Colours::kConsoleYellow);
+    display.TextStatus("Initialize the display", ansi::Colours::Colour::kYellow);
     EVE_Init();
 
-    display.TextStatus("Calibrate the display", console::Colours::kConsoleYellow);
+    display.TextStatus("Calibrate the display", ansi::Colours::Colour::kYellow);
     eve_calibrate();
 
-    display.TextStatus("Load fonts and images", console::Colours::kConsoleYellow);
+    display.TextStatus("Load fonts and images", ansi::Colours::Colour::kYellow);
     eve_load_images(eve_init_fonts());
 
-    display.TextStatus("Start example code", console::Colours::kConsoleGreen);
+    display.TextStatus("Start example code", ansi::Colours::Colour::kGreen);
     eve_display();
 
-    hal::WatchdogInit();
+    watchdog::Init();
 
-    for (;;)
-    {
-        hal::WatchdogFeed();
+    for (;;) {
+        watchdog::Feed();
         network::Run();
         /**
          *

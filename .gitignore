@@ -41,7 +41,8 @@
 
 #Apple
 .DS_Store
+._*
 
-udp_send
 /common/scripts/gd32/venv
 software_version.h
+
