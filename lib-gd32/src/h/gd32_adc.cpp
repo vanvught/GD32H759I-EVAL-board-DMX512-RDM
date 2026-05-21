@@ -2,7 +2,7 @@
  * @file gd32_adc.cpp
  *
  */
-/* Copyright (C) 2024-2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include <cstdint>
 
 #include "gd32.h"
+#include "timing.h"
 
 #define ADC_TEMP_CALIBRATION_VALUE_25 REG16(0x1FF0F7C0)
 #define ADC_TEMP_CALIBRATION_VALUE_MINUS40 REG16(0x1FF0F7C2)
@@ -34,14 +35,12 @@ static float avg_slope;
 static int32_t temperature_value_25;
 static int32_t temperature_value_minus40;
 
-static void RcuConfig()
-{
+static void RcuConfig() {
     /* enable ADC clock */
     rcu_periph_clock_enable(RCU_ADC2);
 }
 
-static void AdcConfig()
-{
+static void AdcConfig() {
     /* reset ADC */
     adc_deinit(ADC2);
     /* ADC clock config */
@@ -74,7 +73,7 @@ static void AdcConfig()
     /* enable ADC interface */
     adc_enable(ADC2);
     /* wait for ADC stability */
-    udelay(1000);
+    timing::DelayUs(1000);
     /* ADC calibration mode config */
     adc_calibration_mode_config(ADC2, ADC_CALIBRATION_OFFSET_MISMATCH);
     /* ADC calibration number config */
@@ -86,8 +85,7 @@ static void AdcConfig()
     adc_software_trigger_enable(ADC2, ADC_INSERTED_CHANNEL);
 }
 
-void Gd32AdcInit()
-{
+void Gd32AdcInit() {
     RcuConfig();
     AdcConfig();
 
@@ -96,15 +94,13 @@ void Gd32AdcInit()
     avg_slope = -(temperature_value_25 - temperature_value_minus40) / (25.0f + 40.0f);
 }
 
-float G32AdcGetTemp()
-{
+float G32AdcGetTemp() {
     const auto kTemperature = (temperature_value_25 - ADC_IDATA0(ADC2)) * 3.3f / 4096 / avg_slope * 1000 + 25;
     adc_software_trigger_enable(ADC2, ADC_INSERTED_CHANNEL);
     return kTemperature;
 }
 
-float Gd32AdcGetVref()
-{
+float Gd32AdcGetVref() {
     const auto kVrefValue = (ADC_IDATA1(ADC2) * 3.3f / 4096);
     adc_software_trigger_enable(ADC2, ADC_INSERTED_CHANNEL);
     return kVrefValue;

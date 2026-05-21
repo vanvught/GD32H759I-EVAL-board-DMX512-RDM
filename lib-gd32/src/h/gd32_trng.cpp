@@ -24,8 +24,7 @@
 
 #include "gd32.h"
 
-void Gd32TrngInit()
-{
+void Gd32TrngInit() {
     rcu_osci_on(RCU_IRC48M);
     while (rcu_flag_get(RCU_FLAG_IRC48MSTB) != SET);
     rcu_ck48m_clock_config(RCU_CK48MSRC_IRC48M);

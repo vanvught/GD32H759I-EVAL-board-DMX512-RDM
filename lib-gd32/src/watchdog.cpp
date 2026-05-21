@@ -1,8 +1,8 @@
 /**
- * @file cache_enable.cpp
+ * @file watchdog.cpp
  *
  */
-/* Copyright (C) 2024-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,6 @@
  * THE SOFTWARE.
  */
 
-#include "gd32.h"
-
-void CacheEnable() {
-    // Enable I-Cache
-    SCB_EnableICache(); // NOLINT
-    // Enable D-Cache
-    SCB_EnableDCache(); // NOLINT
-}
+namespace watchdog::global {
+bool watchdog;
+} // namespace watchdog::global

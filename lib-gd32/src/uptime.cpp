@@ -1,8 +1,8 @@
 /**
- * @file cache_enable.cpp
+ * @file uptime.cpp
  *
  */
-/* Copyright (C) 2024-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+ 
+ #include <cstdint>
 
-#include "gd32.h"
+ #include "gd32.h"
 
-void CacheEnable() {
-    // Enable I-Cache
-    SCB_EnableICache(); // NOLINT
-    // Enable D-Cache
-    SCB_EnableDCache(); // NOLINT
-}
+ extern struct HwTimersSeconds gv_seconds;
+
+ namespace timing {
+ uint32_t UpTime() {
+     return gv_seconds.uptime;
+ }
+ } // namespace timing

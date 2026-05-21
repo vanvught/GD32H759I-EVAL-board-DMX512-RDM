@@ -2,7 +2,7 @@
  * @file usb_host.cpp
  *
  */
-/* Copyright (C) 2023-2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2023-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,10 @@
  * THE SOFTWARE.
  */
 
-#include "gd32.h" // IWYU pragma: keep // DO NOT REMOVE 
+#include "gd32.h" // IWYU pragma: keep // DO NOT REMOVE
 #include "device/usb.h"
 
-extern "C"
-{
+extern "C" {
 #include "usbh_core.h"
 #include "usbh_msc_core.h"
 #include "drv_usbh_int.h"
@@ -42,11 +41,11 @@ usbh_host usb_host;
 #endif
 extern usbh_user_cb usr_cb;
 
-void usb_init()
-{
-    UsbRcuConfig();
-    UsbGpioConfig();
-    UsbVbusConfig();
+namespace usb {
+void Init() {
+    RcuConfig();
+    GpioConfig();
+    VbusConfig();
 #if !defined(GD32F4XX)
     usbh_class_register(&usb_host, &usbh_msc);
     usbh_init(&usb_host, &usr_cb);
@@ -55,10 +54,10 @@ void usb_init()
     usbh_init(&usb_host, &usbh_core, USB_CORE_ENUM_FS, &usr_cb);
 #endif
 
-    UsbIntrConfig();
+    IntrConfig();
 }
+} // namespace usb
 
-extern "C" void USBFS_IRQHandler()
-{
+extern "C" void USBFS_IRQHandler() {
     usbh_isr(&usbh_core);
 }

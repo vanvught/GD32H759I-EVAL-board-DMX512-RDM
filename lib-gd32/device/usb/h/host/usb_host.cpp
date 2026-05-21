@@ -2,7 +2,7 @@
  * usb_host.cpp
  *
  */
-/* Copyright (C) 2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,45 +25,43 @@
 
 #include <cstdint>
 
-#include "gd32.h"
+#include "gd32.h" // IWYU pragma: keep
 
 extern "C" {
 #include "usbh_core.h"
 #include "usbh_msc_core.h"
 #include "drv_usb_core.h"
 #include "drv_usbh_int.h"
-void usb_vbus_drive (uint8_t);
+void usb_vbus_drive(uint8_t);
 void usb_mdelay(uint32_t);
 }
 
-static void usb_gpio_config() {
+static void usb_gpio_config() {}
 
-}
-
-#if !defined (USE_USBHS1)
-# error
+#if !defined(USE_USBHS1)
+#error
 #endif
 
 void usb_rcu_config(void) {
 #ifdef USE_USB_FS
 
 #ifndef USE_IRC48M
-	/* configure the pll1 input and output clock range */
-	rcu_pll_input_output_clock_range_config(IDX_PLL1, RCU_PLL1RNG_4M_8M, RCU_PLL1VCO_192M_836M);
+    /* configure the pll1 input and output clock range */
+    rcu_pll_input_output_clock_range_config(IDX_PLL1, RCU_PLL1RNG_4M_8M, RCU_PLL1VCO_192M_836M);
 
-	rcu_pll1_config(5, 96, 2, 10, 2);
-	/* enable PLL1Q clock output */
-	rcu_pll_clock_output_enable(RCU_PLL1Q);
-	rcu_osci_on(RCU_PLL1_CK);
+    rcu_pll1_config(5, 96, 2, 10, 2);
+    /* enable PLL1Q clock output */
+    rcu_pll_clock_output_enable(RCU_PLL1Q);
+    rcu_osci_on(RCU_PLL1_CK);
 
 #ifdef USE_USBHS0
-    rcu_usbhs_pll1qpsc_config (IDX_USBHS0, RCU_USBHSPSC_DIV1);
+    rcu_usbhs_pll1qpsc_config(IDX_USBHS0, RCU_USBHSPSC_DIV1);
 
     rcu_usb48m_clock_config(IDX_USBHS0, RCU_USB48MSRC_PLL1Q);
 #endif /* USE_USBHS0 */
 
 #ifdef USE_USBHS1
-    rcu_usbhs_pll1qpsc_config (IDX_USBHS1, RCU_USBHSPSC_DIV1);
+    rcu_usbhs_pll1qpsc_config(IDX_USBHS1, RCU_USBHSPSC_DIV1);
 
     rcu_usb48m_clock_config(IDX_USBHS1, RCU_USB48MSRC_PLL1Q);
 #endif /* USE_USBHS1 */
@@ -104,7 +102,7 @@ void usb_rcu_config(void) {
 }
 
 void usb_intr_config() {
-	nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
+    nvic_priority_group_set(NVIC_PRIGROUP_PRE2_SUB2);
 
 #ifdef USE_USBHS0
     nvic_irq_enable((uint8_t)USBHS0_IRQn, 3U, 0U);
@@ -114,8 +112,8 @@ void usb_intr_config() {
     nvic_irq_enable((uint8_t)USBHS1_IRQn, 3U, 0U);
 #endif /* USE_USBHS0 */
 
-	/* enable the power module clock */
-	rcu_periph_clock_enable(RCU_PMU);
+    /* enable the power module clock */
+    rcu_periph_clock_enable(RCU_PMU);
 
 #ifdef USE_USBHS0
     /* USB wakeup EXTI line configuration */
@@ -136,8 +134,8 @@ void usb_intr_config() {
 #endif /* USE_USBHS1 */
 }
 
-void usb_vbus_config () {
-#if defined (USB_HOST_VBUS_GPIOx)
+void usb_vbus_config() {
+#if defined(USB_HOST_VBUS_GPIOx)
     rcu_periph_clock_enable(USB_HOST_VBUS_RCU_GPIOx);
 
     gpio_mode_set(USB_HOST_VBUS_GPIOx, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, USB_HOST_VBUS_GPIO_PINx);
@@ -154,10 +152,10 @@ void pllusb_rcu_config(uint32_t usb_periph) {
     while (pmu_flag_get(PMU_FLAG_USB33RF) != SET) {
     }
 
-    if(USBHS0 == usb_periph) {
+    if (USBHS0 == usb_periph) {
         rcu_pllusb0_config(RCU_PLLUSBHSPRE_HXTAL, RCU_PLLUSBHSPRE_DIV5, RCU_PLLUSBHS_MUL96, RCU_USBHS_DIV10);
         RCU_ADDCTL1 |= RCU_ADDCTL1_PLLUSBHS0EN;
-        while((RCU_ADDCTL1 & RCU_ADDCTL1_PLLUSBHS0STB) == 0U) {
+        while ((RCU_ADDCTL1 & RCU_ADDCTL1_PLLUSBHS0STB) == 0U) {
         }
 
         rcu_usb48m_clock_config(IDX_USBHS0, RCU_USB48MSRC_PLLUSBHS);
@@ -165,7 +163,7 @@ void pllusb_rcu_config(uint32_t usb_periph) {
     } else {
         rcu_pllusb1_config(RCU_PLLUSBHSPRE_HXTAL, RCU_PLLUSBHSPRE_DIV5, RCU_PLLUSBHS_MUL96, RCU_USBHS_DIV10);
         RCU_ADDCTL1 |= RCU_ADDCTL1_PLLUSBHS1EN;
-        while((RCU_ADDCTL1 & RCU_ADDCTL1_PLLUSBHS1STB) == 0U) {
+        while ((RCU_ADDCTL1 & RCU_ADDCTL1_PLLUSBHS1STB) == 0U) {
         }
 
         rcu_usb48m_clock_config(IDX_USBHS1, RCU_USB48MSRC_PLLUSBHS);
@@ -179,49 +177,49 @@ usbh_host usb_host;
 extern usbh_user_cb usr_cb;
 
 void usb_init() {
-	usb_gpio_config();
-	usb_rcu_config();
-	usb_vbus_config();
-	usbh_class_register(&usb_host, &usbh_msc);
+    usb_gpio_config();
+    usb_rcu_config();
+    usb_vbus_config();
+    usbh_class_register(&usb_host, &usbh_msc);
 #ifdef USE_USBHS0
-# ifdef USE_USB_FS
-    usb_para_init (&usbh_core, USBHS0, USB_SPEED_FULL);
-# endif
-# ifdef USE_USB_HS
-    usb_para_init (&usbh_core, USBHS0, USB_SPEED_HIGH);
-# endif
-#endif /* USE_USBHS0 */
-# ifdef USE_USBHS1
-# ifdef USE_USB_FS
-    usb_para_init (&usbh_core, USBHS1, USB_SPEED_FULL);
-# endif
-# ifdef USE_USB_HS
-	usb_para_init(&usbh_core, USBHS1, USB_SPEED_HIGH);
-# endif
-#endif /* USE_USBHS1 */
-	usbh_init(&usb_host, &usbh_core, &usr_cb);
+#ifdef USE_USB_FS
+    usb_para_init(&usbh_core, USBHS0, USB_SPEED_FULL);
+#endif
 #ifdef USE_USB_HS
-# ifndef USE_ULPI_PHY
-#  ifdef USE_USBHS0
-	pllusb_rcu_config(USBHS0);
-#  elif defined USE_USBHS1
-	pllusb_rcu_config(USBHS1);
-#  else
-#  endif
-# endif /* !USE_ULPI_PHY */
+    usb_para_init(&usbh_core, USBHS0, USB_SPEED_HIGH);
+#endif
+#endif /* USE_USBHS0 */
+#ifdef USE_USBHS1
+#ifdef USE_USB_FS
+    usb_para_init(&usbh_core, USBHS1, USB_SPEED_FULL);
+#endif
+#ifdef USE_USB_HS
+    usb_para_init(&usbh_core, USBHS1, USB_SPEED_HIGH);
+#endif
+#endif /* USE_USBHS1 */
+    usbh_init(&usb_host, &usbh_core, &usr_cb);
+#ifdef USE_USB_HS
+#ifndef USE_ULPI_PHY
+#ifdef USE_USBHS0
+    pllusb_rcu_config(USBHS0);
+#elif defined USE_USBHS1
+    pllusb_rcu_config(USBHS1);
+#else
+#endif
+#endif /* !USE_ULPI_PHY */
 #endif /* USE_USB_HS */
-	usb_intr_config();
+    usb_intr_config();
 }
 
 extern "C" {
 #ifdef USE_USBHS0
 void USBHS0_IRQHandler(void) {
-	usbh_isr (&usbh_core);
+    usbh_isr(&usbh_core);
 }
 #endif /* USE_USBHS0 */
 #ifdef USE_USBHS1
 void USBHS1_IRQHandler(void) {
-	usbh_isr(&usbh_core);
+    usbh_isr(&usbh_core);
 }
 #endif /* USE_USBHS1 */
 }

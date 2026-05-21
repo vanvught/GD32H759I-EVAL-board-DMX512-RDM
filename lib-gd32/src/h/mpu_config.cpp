@@ -25,8 +25,7 @@
 
 #include "gd32.h"
 
-void MpuConfig()
-{
+void MpuConfig() {
     mpu_region_init_struct mpu_init_struct;
     mpu_region_struct_para_init(&mpu_init_struct);
 

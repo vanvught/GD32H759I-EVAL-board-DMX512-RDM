@@ -184,9 +184,9 @@
 namespace hal {
 namespace panelled {
 static constexpr uint32_t ACTIVITY = 0;
-static constexpr uint32_t ARTNET = 0;
+static constexpr uint32_t kArtnet = 0;
 static constexpr uint32_t DDP = 0;
-static constexpr uint32_t SACN = 0;
+static constexpr uint32_t kSacn = 0;
 static constexpr uint32_t LTC_IN = 0;
 static constexpr uint32_t LTC_OUT = 0;
 static constexpr uint32_t MIDI_IN = 0;
@@ -195,8 +195,8 @@ static constexpr uint32_t OSC_IN = 0;
 static constexpr uint32_t OSC_OUT = 0;
 static constexpr uint32_t TCNET = 0;
 // DMX
-static constexpr uint32_t PORT_A_RX = 0;
-static constexpr uint32_t PORT_A_TX = 0;
+static constexpr uint32_t kPortARx = 0;
+static constexpr uint32_t kPortATx = 0;
 }  // namespace panelled
 }  // namespace hal
 #endif
