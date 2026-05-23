@@ -176,7 +176,8 @@ usbh_host usb_host;
 
 extern usbh_user_cb usr_cb;
 
-void usb_init() {
+namespace usb {
+void Init() {
     usb_gpio_config();
     usb_rcu_config();
     usb_vbus_config();
@@ -210,6 +211,7 @@ void usb_init() {
 #endif /* USE_USB_HS */
     usb_intr_config();
 }
+} // namespace usb
 
 extern "C" {
 #ifdef USE_USBHS0
