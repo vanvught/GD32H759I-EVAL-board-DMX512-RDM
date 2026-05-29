@@ -105,3 +105,9 @@ float Gd32AdcGetVref() {
     adc_software_trigger_enable(ADC2, ADC_INSERTED_CHANNEL);
     return kVrefValue;
 }
+
+namespace board {
+float CoreTemperatureCurrent() {
+    return G32AdcGetTemp();
+}
+} // namespace board

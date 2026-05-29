@@ -46,3 +46,4 @@
 /common/scripts/gd32/venv
 software_version.h
 
+/lib-gd32/device/usb/f
