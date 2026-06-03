@@ -31,6 +31,7 @@ include ../common/make/Artnet.mk
 include ../common/make/gd32/mbedtls.mk
 include ../common/make/gd32/Validate.mk
 
+LIBS+=fatfs
 LIBS+=gd32 clib
 
 ifeq ($(findstring NODE_SHOWFILE,$(DEFINES)),NODE_SHOWFILE)
