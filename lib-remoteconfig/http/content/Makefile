@@ -7,17 +7,33 @@ LD	= $(PREFIX)ld
 AR	= $(PREFIX)ar
 
 ROOT = ./../../..
-INCLUDES := -I$(ROOT)/lib-httpd/include -I$(ROOT)/lib-hal/include -I$(ROOT)/lib-network/include
+INCLUDES := -I$(ROOT)/common/include -I$(ROOT)/lib-remoteconfig/include -I$(ROOT)/lib-hal/include -I$(ROOT)/lib-network/include
 COPS := -std=c++20 -Wall -Werror
+
+CONTENT ?= light
+USE_GZIP ?= 0
+
+ifeq ($(USE_GZIP),1)
+$(info Building with gzip support)
+COPS += -DUSE_GZIP
+else
+$(info Building without gzip support)
+endif
 
 all : content
 
 clean : 
 	rm -rf generate_content
 	rm -rf *.h
+	rm -rf ._*.*
+	rm -rf ._*
 		
 generate_content : Makefile generate_content.cpp
-	$(CPP) generate_content.cpp $(INCLUDES) $(COPS) -o generate_content 
+	$(CPP) generate_content.cpp $(INCLUDES) $(COPS) -o generate_content
 	
-content : generate_content
-	./generate_content
+pixeltype : $(ROOT)/lib-pixel/include/pixeltype.h
+	 python3 parse_pixeltype.py $(ROOT)/lib-pixel/include/pixeltype.h -o $(CONTENT)/pixeltype.json
+	
+content : generate_content pixeltype
+	@echo "Running with directory $(CONTENT)"
+	./generate_content $(CONTENT)
