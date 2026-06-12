@@ -2,7 +2,7 @@
  * @file mcu.cpp
  *
  */
-/* Copyright (C) 2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +24,17 @@
  */
 
 #include "hal_gpio.h"
-#include "hal_spi.h"
+#include "spi.h"
 #include "firmware/debug/debug_printbits.h"
  #include "firmware/debug/debug_debug.h"
 
 void MCU_Init() {
 	DEBUG_ENTRY();
 
-	FUNC_PREFIX(SpiBegin());
-	FUNC_PREFIX(SpiChipSelect(SPI_CS_NONE));
-	FUNC_PREFIX(SpiSetSpeedHz(1000000));
-	FUNC_PREFIX(SpiSetDataMode(SPI_MODE0));
+	spi::Begin();
+	spi::ChipSelect(spi::kCs);
+	spi::SetSpeedHz(1000000);
+	spi::SetDataMode(spi::kMode0);
 
 	FUNC_PREFIX(GpioFsel(FT8XX_LCD_CS_GPIO, GPIO_FSEL_OUTPUT));
 	FUNC_PREFIX(GpioFsel(FT8XX_LCD_DC_GPIO, GPIO_FSEL_OUTPUT));
@@ -56,9 +56,9 @@ void MCU_Setup() {
 
 	HAL_MemWrite8(EVE_REG_INT_EN, 1);
 	// TOUCH, TAG and CMDEMPTY
-	const auto nMask = static_cast<uint8_t>((1U << 1) | (1U << 2) | (1U << 5));
-	debug::PrintBits(nMask);
-	HAL_MemWrite8(EVE_REG_INT_MASK, nMask);
+	const auto kMask = static_cast<uint8_t>((1U << 1) | (1U << 2) | (1U << 5));
+	debug::PrintBits(kMask);
+	HAL_MemWrite8(EVE_REG_INT_MASK, kMask);
 
 	DEBUG_EXIT();
 }

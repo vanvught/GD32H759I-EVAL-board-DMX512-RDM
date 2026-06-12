@@ -56,7 +56,7 @@
 #include <cstdint>
 
 #include "hal_gpio.h"
-#include "hal_spi.h"
+#include "spi.h"
 #include "timing.h"
 
 /**
@@ -122,8 +122,8 @@ inline void MCU_PDhigh() {
  @param DataToWrite - pointer to buffer to write.
  @param length - number of bytes to write.
  */
-inline void MCU_SPIWrite(const uint8_t *pDataToWrite, const uint32_t nLength) {
-	FUNC_PREFIX(SpiWritenb(reinterpret_cast<const char *>(pDataToWrite), nLength));
+inline void MCU_SPIWrite(const uint8_t *data, uint32_t length) {
+	spi::Writenb(reinterpret_cast<const char *>(data), length);
 }
 
 /**
@@ -135,7 +135,7 @@ inline void MCU_SPIWrite(const uint8_t *pDataToWrite, const uint32_t nLength) {
 inline uint8_t MCU_SPIRead8() {
 	char buffer[1];
 
-	FUNC_PREFIX(SpiTransfern(buffer, 1));
+	spi::Transfern(buffer, 1);
 
 	return buffer[0];
 }
@@ -146,12 +146,12 @@ inline uint8_t MCU_SPIRead8() {
     	 response.
  @param Data to write to EVE.
  */
-inline void MCU_SPIWrite8(const uint8_t DataToWrite) {
+inline void MCU_SPIWrite8(uint8_t data) {
 	char buffer[1];
 
-	buffer[0] = DataToWrite;
+	buffer[0] = data;
 
-	FUNC_PREFIX(SpiWritenb(buffer, 1));
+	spi::Writenb(buffer, 1);
 }
 
 /**
@@ -163,7 +163,7 @@ inline void MCU_SPIWrite8(const uint8_t DataToWrite) {
 inline uint16_t MCU_SPIRead16() {
 	char buffer[2];
 
-	FUNC_PREFIX(SpiTransfern(buffer, 2));
+	spi::Transfern(buffer, 2);
 
 	return static_cast<uint16_t>((buffer[0] << 8) | buffer[1]);
 }
@@ -174,8 +174,8 @@ inline uint16_t MCU_SPIRead16() {
     	 response.
  @param Data to write to EVE.
  */
-inline void MCU_SPIWrite16(const uint16_t DataToWrite) {
-	FUNC_PREFIX(SpiWrite(DataToWrite));
+inline void MCU_SPIWrite16(uint16_t data) {
+	spi::Write(data);
 }
 
 /**
@@ -192,14 +192,14 @@ uint32_t MCU_SPIRead24();
     	 response.
  @param Data to write to EVE.
  */
-inline void MCU_SPIWrite24(const uint32_t DataToWrite) {
+inline void MCU_SPIWrite24(uint32_t data) {
 	char buffer[3];
 
-	buffer[0] = static_cast<uint8_t>(DataToWrite >> 24);
-	buffer[1] = static_cast<uint8_t>(DataToWrite >> 16);
-	buffer[2] = static_cast<uint8_t>(DataToWrite >>  8);
+	buffer[0] = static_cast<uint8_t>(data >> 24);
+	buffer[1] = static_cast<uint8_t>(data >> 16);
+	buffer[2] = static_cast<uint8_t>(data >>  8);
 
-	FUNC_PREFIX(SpiWritenb(buffer, 3));
+	spi::Writenb(buffer, 3);
 }
 
 /**
@@ -211,7 +211,7 @@ inline void MCU_SPIWrite24(const uint32_t DataToWrite) {
 inline uint32_t MCU_SPIRead32() {
 	char buffer[4];
 
-	FUNC_PREFIX(SpiTransfern(buffer, 4));
+	spi::Transfern(buffer, 4);
 
 	return static_cast<uint32_t>((buffer[0] << 24) | (buffer[1] << 16) | (buffer[2] << 8) | buffer[3]);
 }
@@ -222,15 +222,15 @@ inline uint32_t MCU_SPIRead32() {
     	 response.
  @param Data to write to EVE.
  */
-inline void MCU_SPIWrite32(const uint32_t DataToWrite) {
+inline void MCU_SPIWrite32(uint32_t data) {
 	char buffer[4];
 
-	buffer[0] = static_cast<uint8_t>(DataToWrite >> 24);
-	buffer[1] = static_cast<uint8_t>(DataToWrite >> 16);
-	buffer[2] = static_cast<uint8_t>(DataToWrite >>  8);
-	buffer[3] = DataToWrite & 0xFF;
+	buffer[0] = static_cast<uint8_t>(data >> 24);
+	buffer[1] = static_cast<uint8_t>(data >> 16);
+	buffer[2] = static_cast<uint8_t>(data >>  8);
+	buffer[3] = data & 0xFF;
 
-	FUNC_PREFIX(SpiWritenb(buffer, 4));
+	spi::Writenb(buffer, 4);
 }
 
 /**
