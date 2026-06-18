@@ -55,7 +55,7 @@
 
 #include <cstdint>
 
-#include "hal_gpio.h"
+#include "gpio.h"
 #include "spi.h"
 #include "timing.h"
 
@@ -80,7 +80,7 @@ void MCU_Setup();
  	 The EVE requires chip select to toggle frequently.
  */
 inline void MCU_CSlow() {
-	FUNC_PREFIX(GpioClr(FT8XX_LCD_CS_GPIO));
+	gpio::Clr(FT8XX_LCD_CS_GPIO);
 }
 
 /**
@@ -90,7 +90,7 @@ inline void MCU_CSlow() {
  	 The EVE requires chip select to toggle frequently.
  */
 inline void MCU_CShigh() {
-	FUNC_PREFIX(GpioSet(FT8XX_LCD_CS_GPIO));
+	gpio::Set(FT8XX_LCD_CS_GPIO);
 }
 
 /**
@@ -101,7 +101,7 @@ inline void MCU_CShigh() {
  	 deep power saving.
  */
 inline void MCU_PDlow() {
-	FUNC_PREFIX(GpioClr(FT8XX_LCD_DC_GPIO));
+	gpio::Clr(FT8XX_LCD_DC_GPIO);
 }
 
 /**
@@ -112,7 +112,7 @@ inline void MCU_PDlow() {
  	 recovery from deep power saving.
  */
 inline void MCU_PDhigh() {
-	FUNC_PREFIX(GpioSet(FT8XX_LCD_DC_GPIO));
+	gpio::Set(FT8XX_LCD_DC_GPIO);
 }
 
 /**

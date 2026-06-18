@@ -1,8 +1,8 @@
 /**
- * @file dmx_dma_check.h
+ * @file  emac_debug.cpp
  *
  */
-/* Copyright (C) 2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2023-2024 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,41 +23,22 @@
  * THE SOFTWARE.
  */
 
-#ifndef GD32_DMX_DMA_CHECK_H_
-#define GD32_DMX_DMA_CHECK_H_
+#include <cstdio>
 
-#if defined(GD32F10X_HD) || defined(GD32F10X_CL)
-static_assert(DMX_MAX_PORTS <= 4, "Too many ports defined");
-#endif
-#if defined(GD32F20X_CL)
-static_assert(DMX_MAX_PORTS <= 6, "Too many ports defined");
-#endif
+#include "gd32.h"
 
-/**
- * DMA channel check
- */
-#if defined(GD32F10X_HD) || defined(GD32F10X_CL)
-#if defined(DMX_USE_UART4)
-#error There is no DMA channel for UART4
-#endif
-#if defined(DMX_USE_USART5)
-#error USART5 is not available
-#endif
-#if defined(DMX_USE_UART6)
-#error UART6 is not available
-#endif
-#if defined(DMX_USE_UART7)
-#error UART7 is not available
-#endif
+static uint32_t s_counter;
+
+void emac_debug_run() {
+    uint32_t rxfifo_drop;
+    uint32_t rxdma_drop;
+#if defined(GD32H7XX)
+    enet_missed_frame_counter_get(ENETx, &rxfifo_drop, &rxdma_drop);
+#else
+    enet_missed_frame_counter_get(&rxfifo_drop, &rxdma_drop);
 #endif
 
-#if defined(GD32F20X_CL)
-#if defined(DMX_USE_UART4) && defined(DMX_USE_UART7)
-#error DMA1 Channel 3
-#endif
-#if defined(DMX_USE_UART3) && defined(DMX_USE_UART6)
-#error DMA1 Channel 4
-#endif
-#endif
-
-#endif // GD32_DMX_DMA_CHECK_H_
+    if ((rxfifo_drop != 0) || (rxdma_drop != 0)) {
+        printf("%u: RxFIFO: %u RxDMA: %u\n", ++s_counter, rxfifo_drop, rxdma_drop);
+    }
+}

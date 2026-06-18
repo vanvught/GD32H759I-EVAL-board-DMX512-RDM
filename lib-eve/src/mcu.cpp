@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-#include "hal_gpio.h"
+#include "gpio.h"
 #include "spi.h"
 #include "firmware/debug/debug_printbits.h"
  #include "firmware/debug/debug_debug.h"
@@ -36,14 +36,14 @@ void MCU_Init() {
 	spi::SetSpeedHz(1000000);
 	spi::SetDataMode(spi::kMode0);
 
-	FUNC_PREFIX(GpioFsel(FT8XX_LCD_CS_GPIO, GPIO_FSEL_OUTPUT));
-	FUNC_PREFIX(GpioFsel(FT8XX_LCD_DC_GPIO, GPIO_FSEL_OUTPUT));
+	gpio::Fsel(FT8XX_LCD_CS_GPIO, gpio::Select::kOutput);
+	gpio::Fsel(FT8XX_LCD_DC_GPIO, gpio::Select::kOutput);
 
-	FUNC_PREFIX(GpioFsel(FT8XX_LCD_INT_GPIO, GPIO_FSEL_INPUT));
-	FUNC_PREFIX(GpioSetPud(FT8XX_LCD_INT_GPIO, GPIO_PULL_UP));
+	gpio::Fsel(FT8XX_LCD_INT_GPIO, gpio::Select::kInput);
+	gpio::SetPud(FT8XX_LCD_INT_GPIO, gpio::Pull::kUp);
 
-	FUNC_PREFIX(GpioSet(FT8XX_LCD_CS_GPIO));
-	FUNC_PREFIX(GpioSet(FT8XX_LCD_DC_GPIO));
+	gpio::Set(FT8XX_LCD_CS_GPIO);
+	gpio::Set(FT8XX_LCD_DC_GPIO);
 
 	DEBUG_EXIT();
 }
