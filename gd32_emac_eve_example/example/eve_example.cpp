@@ -123,10 +123,10 @@ void eve_display() {
 static uint8_t key;
 
 void eve_example_run() {
-	if (__builtin_expect(FUNC_PREFIX(GpioLev(FT8XX_LCD_INT_GPIO)) == 0, 0)) {
-		const auto nFlags = HAL_MemRead8(EVE_REG_INT_FLAGS);
-		debug::PrintBits(nFlags);
-		if ((nFlags & (1U << 1)) == (1U << 1)) {
+	if (__builtin_expect(gpio::Lev(FT8XX_LCD_INT_GPIO) == 0, 0)) {
+		const auto kFlags = HAL_MemRead8(EVE_REG_INT_FLAGS);
+		debug::PrintBits(kFlags);
+		if ((kFlags & (1U << 1)) == (1U << 1)) {
 		}
 	}
 
