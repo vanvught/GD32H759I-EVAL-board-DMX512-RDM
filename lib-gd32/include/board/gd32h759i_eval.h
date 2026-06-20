@@ -36,11 +36,6 @@
 
 #include <stdint.h>
 
-#define USE_ENET0
-
-#define USE_USB_HS
-#define USE_USBHS1
-
 /**
  * U(S)ART
  */

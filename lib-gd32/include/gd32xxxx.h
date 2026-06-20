@@ -34,6 +34,7 @@
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #if __cplusplus > 201402
 // error: compound assignment with 'volatile'-qualified left operand is
 // deprecated
