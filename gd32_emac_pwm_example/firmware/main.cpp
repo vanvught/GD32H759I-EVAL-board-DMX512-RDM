@@ -25,23 +25,23 @@
 
 #include <time.h>
 
-#include "gd32/hal.h"
+#include "board.h"
 #include "watchdog.h"
 #include "network.h"
 #include "displayudf.h"
 #include "json/displayudfparams.h"
 #include "remoteconfig.h"
 #include "configstore.h"
-#include "firmwareversion.h"
+#include "firmware/firmwareversion.h"
 #include "software_version.h"
 #include "gd32_pwm.h"
 
-namespace hal {
+namespace board {
 void RebootHandler() {}
-} // namespace hal
+} // namespace board
 
 int main() {
-    hal::Init();
+    board::Init();
     DisplayUdf display;
     ConfigStore config_store;
     network::Init();
@@ -74,7 +74,7 @@ int main() {
     for (;;) {
         watchdog::Feed();
         network::Run();
-        hal::Run();
+        board::Run();
 
         const auto kT2 = time(nullptr);
 

@@ -27,13 +27,13 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "gd32/hal.h"
+#include "board.h"
 #include "watchdog.h"
 #include "network.h"
 #include "display.h"
 #include "remoteconfig.h"
 #include "configstore.h"
-#include "firmwareversion.h"
+#include "firmware/firmwareversion.h"
 #include "software_version.h"
 #include "EVE.h"
 #include "eve_example.h"
@@ -90,12 +90,12 @@ int8_t platform_calib_read(struct touchscreen_calibration* calib) {
     return -1;
 }
 
-namespace hal {
+namespace board {
 void RebootHandler() {}
-} // namespace hal
+} // namespace board
 
 int main() { // NOLINT
-    hal::Init();
+    board::Init();
     Display display;
     ConfigStore config_store;
     network::Init();
@@ -129,6 +129,6 @@ int main() { // NOLINT
         /**
          *
          */
-        hal::Run();
+        board::Run();
     }
 }

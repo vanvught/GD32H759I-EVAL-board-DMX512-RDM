@@ -28,7 +28,7 @@
 #include <cstring>
 #include <time.h>
 
-#include "gd32/hal.h"
+#include "board.h"
 #include "watchdog.h"
 #include "network.h"
 #include "displayudf.h"
@@ -39,17 +39,17 @@
 
 #include "configstore.h"
 
-#include "firmwareversion.h"
+#include "firmware/firmwareversion.h"
 #include "software_version.h"
 
 #include "gd32_quadrature_decoder.h"
 
-namespace hal {
+namespace board {
 void RebootHandler() {}
-} // namespace hal
+} // namespace board
 
 int main() {
-    hal::Init();
+    board::Init();
     DisplayUdf display;
     ConfigStore config_store;
     network::Init();
@@ -81,7 +81,7 @@ int main() {
     for (;;) {
         watchdog::Feed();
         network::Run();
-        hal::Run();
+        board::Run();
         /*
          *
          */
