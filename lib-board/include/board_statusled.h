@@ -1,8 +1,8 @@
 /**
- * @file hal_api.h
+ * @file hal_statusled.h
  *
  */
-/* Copyright (C) 2023-2025 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2025-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,17 +23,25 @@
  * THE SOFTWARE.
  */
 
-#ifndef HAL_API_H_
-#define HAL_API_H_
+#ifndef BOARD_STATUSLED_H_
+#define BOARD_STATUSLED_H_
 
-#if defined(__linux__) || defined(__APPLE__)
-#include "linux/hal_api.h"
-#elif defined(H3)
-#include "h3/hal_api.h"
-#elif defined(GD32)
-#include "gd32/hal_api.h"
-#else
-#include "rpi/hal_api.h"
-#endif
+#include <cstdint>
 
-#endif  // HAL_API_H_
+namespace board::statusled {
+enum class Mode { kOffOff, kOffOn, kNormal, kData, kFast, kReboot, kUnknown };
+
+namespace global {
+extern Mode g_status_led_mode;
+} // namespace global
+
+void SetModeWithLock(Mode mode, bool do_lock);
+void SetMode(Mode mode);
+inline Mode GetMode() {
+    return global::g_status_led_mode;
+}
+void SetFrequency(uint32_t frequency_hz);
+void Event(Mode mode);
+} // namespace board::statusled
+
+#endif // BOARD_STATUSLED_H_
