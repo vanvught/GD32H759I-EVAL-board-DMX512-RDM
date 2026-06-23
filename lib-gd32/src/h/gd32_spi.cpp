@@ -33,13 +33,13 @@ static uint8_t s_n_chip_select = GD32_SPI_CS0;
 
 static inline void cs_high() {
     if (s_n_chip_select == GD32_SPI_CS0) {
-        GPIO_BOP(SPI_NSS_GPIOx) = static_cast<uint32_t>(SPI_NSS_GPIO_PINx);
+        GPIO_BOP(SPI_NSS_GPIOx) = SPI_NSS_GPIO_PINx;
     }
 }
 
 static inline void cs_low() {
     if (s_n_chip_select == GD32_SPI_CS0) {
-        GPIO_BC(SPI_NSS_GPIOx) = static_cast<uint32_t>(SPI_NSS_GPIO_PINx);
+        GPIO_BC(SPI_NSS_GPIOx) = SPI_NSS_GPIO_PINx;
     }
 }
 
