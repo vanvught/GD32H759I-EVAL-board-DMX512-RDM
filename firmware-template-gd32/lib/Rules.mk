@@ -41,6 +41,7 @@ COPS+=-Wconversion
 endif
 
 include ../common/make/CppOps.mk
+include ../common/make/gd32/Gd32FirmwareOps.mk
 
 BUILD=build_gd32/
 BUILD_DIRS:=$(addprefix build_gd32/,$(SRCDIR))
@@ -62,7 +63,7 @@ $(info $$TARGET [${TARGET}])
 define compile-objects
 $(info $1)
 $(BUILD)$1/%.o: $1/%.c
-	$(CC) -MD -MP $(COPS) -c $$< -o $$@
+	$(CC) -MD -MP $(COPS) $(GD32FIRMWAREOPS) -c $$< -o $$@
 
 $(BUILD)$1/%.o: $1/%.cpp
 	$(CPP) -MD -MP $(COPS) $(CPPOPS) -c $$< -o $$@
@@ -85,9 +86,6 @@ builddirs:
 clean:
 	rm -rf build_gd32
 	rm -rf lib_gd32
-	
-$(BUILD)%.o: %.c
-	$(CC) $(COPS) -c $< -o $@
 	
 $(TARGET): Makefile.GD32 $(OBJECTS)
 	$(AR) -r $(TARGET) $(OBJECTS)
