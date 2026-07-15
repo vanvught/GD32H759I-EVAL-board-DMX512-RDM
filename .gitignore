@@ -47,3 +47,4 @@
 software_version.h
 
 /lib-gd32/device/usb/f
+lib-remoteconfig/http/content/light/pixeltype.json
