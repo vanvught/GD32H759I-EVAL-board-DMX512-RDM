@@ -29,6 +29,7 @@
 #include <cstdint>
 
 #include "gd32.h" // IWYU pragma: keep
+#include "gd32/dmx_port.h"
 
 #define DMX_MAX_PORTS 2
 
@@ -46,37 +47,13 @@ inline constexpr uint32_t kPorts = DMX_MAX_PORTS;
 // #define DMX_USE_UART6
 // #define DMX_USE_UART7
 
-// inline constexpr auto kUsart0Port = 7;
-// tatic constexpr auto kUsart1Port = 0;
-inline constexpr auto kUsart2Port = 0;
-// inline constexpr auto kUart3Port = 2;
-// inline constexpr auto kUart4Port = 3;
-inline constexpr auto kUsart5Port = 1;
-// inline constexpr auto kUart6Port = 5;
-// inline constexpr auto kUart7Port = 6;
-
-inline constexpr auto kDirPort0GpioPort = GPIOA;
-inline constexpr auto kDirPort0GpioPin = GPIO_PIN_5;
-
-inline constexpr auto kDirPort1GpioPort = GPIOA;
-inline constexpr auto kDirPort1GpioPin = GPIO_PIN_6;
-
-inline constexpr auto kDirPort2GpioPort = GPIOA;
-inline constexpr auto kDirPort2GpioPin = GPIO_PIN_5;
-
-inline constexpr auto kDirPort3GpioPort = GPIOA;
-inline constexpr auto kDirPort3GpioPin = GPIO_PIN_6;
-
-inline constexpr auto kDirPort4GpioPort = GPIOA;
-inline constexpr auto kDirPort4GpioPin = GPIO_PIN_5;
-
-inline constexpr auto kDirPort5GpioPort = GPIOA;
-inline constexpr auto kDirPort5GpioPin = GPIO_PIN_6;
-
-inline constexpr auto kDirPort6GpioPort = GPIOA;
-inline constexpr auto kDirPort6GpioPin = GPIO_PIN_5;
-
-inline constexpr auto kDirPort7GpioPort = GPIOA;
-inline constexpr auto kDirPort7GpioPin = GPIO_PIN_6;
+inline constexpr port::Info kPort0 = {.uart = gd32::Uart::kUart2, .port = GPIOA, .pin = GPIO_PIN_5, .usage = port::Usage::kTxRx};
+inline constexpr port::Info kPort1 = {.uart = gd32::Uart::kUart5, .port = GPIOA, .pin = GPIO_PIN_6, .usage = port::Usage::kTxRx};
+inline constexpr port::Info kPort2 = {.uart = gd32::Uart::kUart0, .port = GPIOA, .pin = GPIO_PIN_5, .usage = port::Usage::kTxRx};
+inline constexpr port::Info kPort3 = {.uart = gd32::Uart::kUart1, .port = GPIOA, .pin = GPIO_PIN_6, .usage = port::Usage::kTxRx};
+inline constexpr port::Info kPort4 = {.uart = gd32::Uart::kUart3, .port = GPIOA, .pin = GPIO_PIN_5, .usage = port::Usage::kTxRx};
+inline constexpr port::Info kPort5 = {.uart = gd32::Uart::kUart4, .port = GPIOA, .pin = GPIO_PIN_6, .usage = port::Usage::kTxRx};
+inline constexpr port::Info kPort6 = {.uart = gd32::Uart::kUart6, .port = GPIOA, .pin = GPIO_PIN_5, .usage = port::Usage::kTxRx};
+inline constexpr port::Info kPort7 = {.uart = gd32::Uart::kUart7, .port = GPIOA, .pin = GPIO_PIN_6, .usage = port::Usage::kTxRx};
 } // namespace dmx::config
 #endif // DMX_BOARD_GD32H759I_EVAL_H_
