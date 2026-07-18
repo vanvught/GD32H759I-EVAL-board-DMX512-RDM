@@ -1,5 +1,4 @@
 /**
- * File is updated with lib-hal API's.
  */
 /**
  @file MCU.h
