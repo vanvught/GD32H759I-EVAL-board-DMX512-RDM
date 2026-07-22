@@ -196,6 +196,18 @@ SECTIONS
     . = . + __heap_size;
     heap_top = .;
   } >RAM
+  
+  .http (NOLOAD) :
+  {
+    . = ALIGN(4);
+    _shttp = .;
+    KEEP(*(.http))
+    KEEP(*(.http.*))
+    KEEP(*(.httpd))
+    KEEP(*(.httpd.*))
+    . = ALIGN(4);
+    _ehttp = .;
+  } > RAM
 
   .sram1 :
   {
