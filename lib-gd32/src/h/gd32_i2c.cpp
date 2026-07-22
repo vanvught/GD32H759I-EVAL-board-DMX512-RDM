@@ -39,13 +39,14 @@
 #include "gd32.h"
 #include "firmware/debug/debug_debug.h"
 
+namespace {
 enum class State { I2C_START, I2C_TRANSMIT_DATA, I2C_RELOAD, I2C_STOP };
 
-static constexpr uint8_t MAX_RELOAD_SIZE = 255;
-static constexpr int32_t I2C_TIME_OUT = 50000;
-static uint8_t s_nAddress;
+constexpr uint8_t MAX_RELOAD_SIZE = 255;
+constexpr int32_t I2C_TIME_OUT = 50000;
+uint8_t s_nAddress;
 
-static void GpioConfig() {
+void GpioConfig() {
     rcu_periph_clock_enable(I2C_SCL_RCU_GPIOx);
     rcu_periph_clock_enable(I2C_SDA_RCU_GPIOx);
     rcu_periph_clock_enable(I2C_RCU_I2Cx);
@@ -60,12 +61,13 @@ static void GpioConfig() {
     gpio_output_options_set(I2C_SDA_GPIOx, GPIO_OTYPE_OD, GPIO_OSPEED_60MHZ, I2C_SDA_GPIO_PINx);
 }
 
-static void i2c_config() {
+void i2c_config() {
     rcu_i2c_clock_config(I2C_RCU_IDX, RCU_I2CSRC_IRC64MDIV);
     i2c_timing_config(I2CX, 0x0, 0x6, 0);
     i2c_master_clock_config(I2CX, 0x26, 0x73);
     i2c_enable(I2CX);
 }
+} // namespace
 
 /**
  * Public API's
