@@ -136,7 +136,7 @@ SECTIONS
     PROVIDE( _sp = . ); 
   } >DTCMRAM
 
-  .dtcmram :
+  .dtcmram (NOLOAD) :
   {
     . = ALIGN(4);
     _sdtcmram = .;
@@ -156,7 +156,7 @@ SECTIONS
     _edtcmram = .;
   } >DTCMRAM
 
-  .coherent :
+  .coherent (NOLOAD) :
   {
      *(.dmx*)
   } >RAMC
@@ -209,21 +209,21 @@ SECTIONS
     _ehttp = .;
   } > RAM
 
-  .sram1 :
+  .sram1 (NOLOAD) :
   {
     . = ALIGN(4);
     *(.sram1)
     *(.sram1*)
   } >RAM1 
   
-  .sram2 :
+  .sram2 (NOLOAD) :
   {
     . = ALIGN(4);
     *(.sram2)
     *(.sram2*)
   } >RAM2 
 
-  .bkpsram :
+  .bkpsram (NOLOAD) :
   {
     . = ALIGN(4);
     *(.bkpsram)

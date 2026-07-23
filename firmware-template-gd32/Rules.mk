@@ -2,11 +2,13 @@ $(info "Rules.mk")
 
 PREFIX ?= arm-none-eabi-
 
-CC	 = $(PREFIX)gcc
-CPP	 = $(PREFIX)g++
-AS	 = $(CC)
-LD	 = $(PREFIX)ld
-AR	 = $(PREFIX)ar
+CC      = $(PREFIX)gcc
+CPP     = $(PREFIX)g++
+AS      = $(CC)
+LD      = $(PREFIX)gcc
+AR      = $(PREFIX)gcc-ar
+RANLIB  = $(PREFIX)gcc-ranlib
+NM      = $(PREFIX)gcc-nm
 
 BOARD?=BOARD_GD32H759I_EVAL
 ENET_PHY?=DP83848
@@ -64,20 +66,10 @@ COPS+=-Os -nostartfiles -ffreestanding -nostdlib
 COPS+=-fstack-usage
 COPS+=-ffunction-sections -fdata-sections
 COPS+=-Wall -Werror -Wpedantic -Wextra -Wunused -Wsign-conversion -Wconversion -Wduplicated-cond -Wlogical-op
+COPS+=-flto=auto
 
-CPPOPS=-std=c++20
-CPPOPS+=-Wnon-virtual-dtor -Woverloaded-virtual -Wnull-dereference -fno-rtti -fno-exceptions -fno-unwind-tables
-CPPOPS+=-Wuseless-cast -Wold-style-cast
-CPPOPS+=-fno-threadsafe-statics
-CPPOPS+=-fno-use-cxa-atexit
-
-LDOPS=--gc-sections --print-gc-sections --print-memory-usage
-
-PLATFORM_LIBGCC+= -L $(shell dirname `$(CC) $(COPS) -print-libgcc-file-name`)
-PLATFORM_LIBC+= -L $(shell dirname `$(CC) $(COPS) --print-file-name=libc.a`)
-
-$(info $$PLATFORM_LIBGCC [${PLATFORM_LIBGCC}])
-$(info $$PLATFORM_LIBC [${PLATFORM_LIBC}])
+include ../common/make/CppOps.mk
+include ../common/make/LdOps.mk
 
 C_OBJECTS=$(foreach sdir,$(SRCDIR),$(patsubst $(sdir)/%.c,$(BUILD)$(sdir)/%.o,$(wildcard $(sdir)/*.c)))
 C_OBJECTS+=$(foreach sdir,$(SRCDIR),$(patsubst $(sdir)/%.cpp,$(BUILD)$(sdir)/%.o,$(wildcard $(sdir)/*.cpp)))
@@ -131,21 +123,73 @@ $(LIBDEP):
 $(BUILD_DIRS) :
 	mkdir -p $(BUILD_DIRS)
 
-$(BUILD)startup_$(FAMILY).o : $(FIRMWARE_DIR)/startup_$(FAMILY).S
-	$(AS) $(COPS) -D__ASSEMBLY__ -c $(FIRMWARE_DIR)/startup_$(FAMILY).S -o $(BUILD)startup_$(FAMILY).o
+#
+# Startup and support objects
+#
 
+# Assemble the MCU startup code.
+$(BUILD)startup_$(LINE).o : $(FIRMWARE_DIR)/startup_$(LINE).S
+	$(AS) $(COPS) -D__ASSEMBLY__ -c $(FIRMWARE_DIR)/startup_$(LINE).S -o $(BUILD)startup_$(LINE).o
+
+# Compile the common HardFault handler.
 $(BUILD)hardfault_handler.o : $(FIRMWARE_DIR)/hardfault_handler.cpp	
 	$(CPP) $(COPS) $(CPPOPS) -c $(FIRMWARE_DIR)/hardfault_handler.cpp -o $(BUILD)hardfault_handler.o
 
+# Compile the common debug Stack handler.
 $(BUILD)stack_debug_init.o : $(FIRMWARE_DIR)/stack_debug_init.cpp	
 	$(CPP) $(COPS) $(CPPOPS) -c $(FIRMWARE_DIR)/stack_debug_init.cpp -o $(BUILD)stack_debug_init.o
 
-$(BUILD)main.elf: Makefile.GD32 $(LINKER) $(BUILD)startup_$(FAMILY).o $(BUILD)hardfault_handler.o $(BUILD)stack_debug_init.o $(OBJECTS) $(LIBDEP)
-	$(LD) $(BUILD)startup_$(FAMILY).o $(BUILD)hardfault_handler.o $(BUILD)stack_debug_init.o $(OBJECTS) -Map $(MAP) -T $(LINKER) $(LDOPS) -o $(BUILD)main.elf $(LIBGD32) $(LDLIBS) $(PLATFORM_LIBGCC) -lgcc
-	$(PREFIX)objdump -D $(BUILD)main.elf | $(PREFIX)c++filt > $(LIST)
-	$(PREFIX)size -A -x $(BUILD)main.elf
+#
+# Link the ELF image
+#	
+	
+# Link all object files together with the dependent libraries.
+# A linker map and a demangled disassembly listing are generated
+# for debugging and analysis.
+$(BUILD)main.elf: \
+		Makefile.GD32 \
+		$(LINKER) \
+		$(BUILD)startup_$(LINE).o \
+		$(BUILD)hardfault_handler.o \
+		$(BUILD)stack_debug_init.o \
+		$(OBJECTS) \
+		$(LIBDEP) \
+		| builddirs
+	  $(LD) \
+		$(BUILD)startup_$(LINE).o \
+		$(BUILD)hardfault_handler.o \
+		$(BUILD)stack_debug_init.o \
+		$(OBJECTS) \
+		-T $(LINKER) \
+		$(LDOPS) \
+		-o $@ \
+		$(LIBGD32) \
+		$(LDLIBS) \
+		-lgcc
 
-$(TARGET) : $(BUILD)main.elf
-	$(PREFIX)objcopy $(BUILD)main.elf -O binary $(TARGET) --remove-section=.dtcmram* --remove-section=.coherent* --remove-section=.sram1* --remove-section=.sram2* --remove-section=.bkpsram*
+	# Generate a demangled disassembly listing.
+	$(PREFIX)objdump -D $@ | $(PREFIX)c++filt > $(LIST)
+
+	# Display the memory usage by section.
+	$(PREFIX)size -A -x $@
+
+#
+# Create the binary firmware image
+#
+
+# Convert the ELF image into a binary image. RAM-only sections are
+# removed because they are initialized at runtime rather than stored
+# in flash.
+$(TARGET): $(BUILD)main.elf
+	$(PREFIX)objcopy $< \
+		-O binary \
+		$@ \
+		--remove-section=.tcmsram* \
+		--remove-section=.dtcmram* \
+		--remove-section=.coherent* \
+		--remove-section=.sram1* \
+		--remove-section=.sram2* \
+		--remove-section=.ramadd* \
+		--remove-section=.bkpsram*
 
 $(foreach bdir,$(SRCDIR),$(eval $(call compile-objects,$(bdir))))
