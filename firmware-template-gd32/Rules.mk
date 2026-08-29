@@ -33,12 +33,15 @@ include ../common/make/Artnet.mk
 include ../common/make/gd32/mbedtls.mk
 include ../common/make/gd32/Validate.mk
 
-LIBS+=fatfs
-LIBS+=gd32 clib
+ifeq ($(findstring USB_HOST_MSC,$(DEFINES)),USB_HOST_MSC)
+	LIBS+=fatfs
+endif
 
 ifeq ($(findstring NODE_SHOWFILE,$(DEFINES)),NODE_SHOWFILE)
 	LIBS+=showfile
 endif
+
+LIBS+=gd32 clib
 
 # The variable for the libraries include directory
 LIBINCDIRS:=$(addprefix -I../lib-,$(LIBS))
