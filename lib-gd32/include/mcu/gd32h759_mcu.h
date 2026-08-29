@@ -28,7 +28,7 @@
 
 #if !defined(GD32H759)
 # error This file should not be included
-#endif
+#endif // GD32H759
 
 #include <stdint.h>
 
@@ -43,4 +43,4 @@
 
 #include "gd32h7xx_mcu.h"
 
-#endif /* MCU_GD32H759_MCU_H_ */
+#endif // MCU_GD32H759_MCU_H_

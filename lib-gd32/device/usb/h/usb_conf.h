@@ -49,12 +49,12 @@ OF SUCH DAMAGE.
 /* on-chip full-speed USB PHY */
 #ifdef USE_USB_FS
 #define OC_FS_PHY
-#endif
+#endif // USE_USB_FS
 
 /* on-chip high-speed USB PHY */
 #ifdef USE_USB_HS
 #define OC_HS_PHY
-#endif /* USE_USB_HS */
+#endif // USE_USB_HS
 
 /*******************************************************************************
  *                      FIFO Size Configuration in Device mode
@@ -108,8 +108,8 @@ OF SUCH DAMAGE.
 #define USB_EMBEDDED_HS_PHY_ENABLED
 #else
 #error "PHY is not selected"
-#endif
-#endif
+#endif // OC_FS_PHY
+#endif // USE_ULPI_PHY
 
 // #define USB_INTERNAL_DMA_ENABLED
 
@@ -126,20 +126,20 @@ OF SUCH DAMAGE.
 #ifndef OC_FS_PHY
 #ifndef OC_HS_PHY
 #error "OC_FS_PHY or OC_HS_PHY should be defined!"
-#endif
-#endif
+#endif // OC_HS_PHY
+#endif // OC_FS_PHY
 
 #ifndef USE_DEVICE_MODE
 #ifndef USE_HOST_MODE
 #error "USE_DEVICE_MODE or USE_HOST_MODE should be defined!"
-#endif
-#endif
+#endif // USE_HOST_MODE
+#endif // USE_DEVICE_MODE
 
 #ifndef USE_USB_HS
 #ifndef USE_USB_FS
 #error "USE_USB_HS or USE_USB_FS should be defined!"
-#endif
-#endif
+#endif // USE_USB_FS
+#endif // USE_USB_HS
 
 /* In HS mode and when the DMA is used, all variables and data structures dealing
    with the DMA during the transaction process should be 4-bytes aligned */
@@ -156,16 +156,16 @@ OF SUCH DAMAGE.
 #define __ALIGN_BEGIN
 #elif defined(__TASKING__) /* TASKING Compiler */
 #define __ALIGN_BEGIN __align(4)
-#endif /* __CC_ARM */
-#endif /* __GNUC__ */
+#endif // __CC_ARM
+#endif // __GNUC__
 
 /* __packed keyword used to decrease the data type alignment to 1-byte */
 #if defined(__GNUC__) /* GNU Compiler */
 #ifndef __packed
 #define __packed __attribute__((__packed__))
-#endif
+#endif // __packed
 #elif defined(__TASKING__) /* TASKING Compiler */
 #define __packed __unaligned
-#endif /* __CC_ARM */
+#endif // __GNUC__
 
-#endif /* __USB_CONF_H */
+#endif // __USB_CONF_H

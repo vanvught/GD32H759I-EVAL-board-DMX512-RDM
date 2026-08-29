@@ -28,11 +28,11 @@
 
 #if !defined(BOARD_GD32H759I_EVAL)
 # error This file should not be included
-#endif
+#endif // BOARD_GD32H759I_EVAL
 
 #if defined (MCU_GD32H759_MCU_H_)
 # error This file should be included later
-#endif
+#endif // defined (MCU_GD32H759_MCU_H_)
 
 #include <stdint.h>
 
@@ -192,7 +192,7 @@ inline constexpr uint32_t kTcnet = 0;
 inline constexpr uint32_t kPortARx = 0;
 inline constexpr uint32_t kPortATx = 0;
 } // namespace panelled
-#endif
+#endif // __cplusplus
 
 /**
  * SPI flash
@@ -210,13 +210,13 @@ inline constexpr uint32_t kPortATx = 0;
 # define USB_HOST_VBUS_GPIOx		GPIOA
 # define USB_HOST_VBUS_RCU_GPIOx	RCU_GPIOA
 # define USB_HOST_VBUS_GPIO_PINx	GPIO_PIN_6
-#endif
+#endif // USE_USBHS0
 
 #ifdef USE_USBHS1
 # define USB_HOST_VBUS_GPIOx		GPIOB
 # define USB_HOST_VBUS_RCU_GPIOx	RCU_GPIOB
 # define USB_HOST_VBUS_GPIO_PINx	GPIO_PIN_2
-#endif
+#endif // USE_USBHS1
 
 #define HOST_SOF_OUTPUT_RCC			RCC_APB2PERIPH_GPIOA
 #define HOST_SOF_PORT				GPIOA
@@ -246,4 +246,4 @@ inline constexpr uint32_t kPortATx = 0;
 #define FT8XX_LCD_CS_GPIO		GD32_PORT_TO_GPIO(GD32_GPIO_PORTF, 6)
 #define FT8XX_LCD_INT_GPIO		GD32_PORT_TO_GPIO(GD32_GPIO_PORTG, 3)
 
-#endif /* BOARD_GD32H759I_EVAL_H_ */
+#endif // BOARD_GD32H759I_EVAL_H_

@@ -29,8 +29,8 @@
 #pragma GCC optimize("O2")
 #else
 #pragma GCC optimize("O3")
-#endif
-#endif
+#endif // CONFIG_I2C_OPTIMIZE_O2
+#endif // defined(CONFIG_I2C_OPTIMIZE_O2) || defined(CONFIG_I2C_OPTIMIZE_O3)
 
 #include <cstdint>
 #include <cassert>

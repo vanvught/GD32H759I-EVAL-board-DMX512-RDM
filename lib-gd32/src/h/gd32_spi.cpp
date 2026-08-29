@@ -29,21 +29,22 @@
 #include "gd32_spi.h"
 #include "gd32.h"
 
-static uint8_t s_n_chip_select = GD32_SPI_CS0;
+namespace {
+uint8_t s_n_chip_select = GD32_SPI_CS0;
 
-static inline void cs_high() {
+void cs_high() {
     if (s_n_chip_select == GD32_SPI_CS0) {
         GPIO_BOP(SPI_NSS_GPIOx) = SPI_NSS_GPIO_PINx;
     }
 }
 
-static inline void cs_low() {
+void cs_low() {
     if (s_n_chip_select == GD32_SPI_CS0) {
         GPIO_BC(SPI_NSS_GPIOx) = SPI_NSS_GPIO_PINx;
     }
 }
 
-static uint8_t send_byte(uint8_t byte) {
+uint8_t send_byte(uint8_t byte) {
     while (RESET == spi_i2s_flag_get(SPI_PERIPH, SPI_FLAG_TP));
 
     SPI_TDATA(SPI_PERIPH) = static_cast<uint32_t>(byte);
@@ -52,6 +53,7 @@ static uint8_t send_byte(uint8_t byte) {
 
     return static_cast<uint8_t>(SPI_RDATA(SPI_PERIPH));
 }
+} // namespace
 
 void Gd32SpiBegin() {
     rcu_periph_clock_enable(SPI_SCK_RCU_GPIOx);

@@ -40,7 +40,7 @@ static void usb_gpio_config() {}
 
 #if !defined(USE_USBHS1)
 #error
-#endif
+#endif // USE_USBHS1
 
 void usb_rcu_config(void) {
 #ifdef USE_USB_FS
@@ -58,13 +58,13 @@ void usb_rcu_config(void) {
     rcu_usbhs_pll1qpsc_config(IDX_USBHS0, RCU_USBHSPSC_DIV1);
 
     rcu_usb48m_clock_config(IDX_USBHS0, RCU_USB48MSRC_PLL1Q);
-#endif /* USE_USBHS0 */
+#endif // USE_USBHS0
 
 #ifdef USE_USBHS1
     rcu_usbhs_pll1qpsc_config(IDX_USBHS1, RCU_USBHSPSC_DIV1);
 
     rcu_usb48m_clock_config(IDX_USBHS1, RCU_USB48MSRC_PLL1Q);
-#endif /* USE_USBHS1 */
+#endif // USE_USBHS1
 
 #else
     /* enable IRC48M clock */
@@ -78,27 +78,27 @@ void usb_rcu_config(void) {
 
 #ifdef USE_USBHS0
     rcu_usb48m_clock_config(IDX_USBHS0, RCU_USB48MSRC_IRC48M);
-#endif /* USE_USBHS0 */
+#endif // USE_USBHS0
 
 #ifdef USE_USBHS1
     rcu_usb48m_clock_config(IDX_USBHS1, RCU_USB48MSRC_IRC48M);
-#endif /* USE_USBHS1 */
+#endif // USE_USBHS1
 
-#endif /* USE_IRC48M */
+#endif // USE_IRC48M
 
-#endif /* USE_USB_FS */
+#endif // USE_USB_FS
 
 #ifdef USE_USBHS0
     rcu_periph_clock_enable(RCU_USBHS0);
-#endif /* USE_USBHS0 */
+#endif // USE_USBHS0
 
 #ifdef USE_USBHS1
     rcu_periph_clock_enable(RCU_USBHS1);
-#endif /* USE_USBHS1 */
+#endif // USE_USBHS1
 
 #ifdef USE_ULPI_PHY
     rcu_periph_clock_enable(RCU_ULPI);
-#endif /* USE_ULPI_PHY */
+#endif // USE_ULPI_PHY
 }
 
 void usb_intr_config() {
@@ -106,11 +106,11 @@ void usb_intr_config() {
 
 #ifdef USE_USBHS0
     nvic_irq_enable((uint8_t)USBHS0_IRQn, 3U, 0U);
-#endif /* USE_USBHS0 */
+#endif // USE_USBHS0
 
 #ifdef USE_USBHS1
     nvic_irq_enable((uint8_t)USBHS1_IRQn, 3U, 0U);
-#endif /* USE_USBHS0 */
+#endif // USE_USBHS1
 
     /* enable the power module clock */
     rcu_periph_clock_enable(RCU_PMU);
@@ -122,7 +122,7 @@ void usb_intr_config() {
     exti_interrupt_enable(EXTI_31);
 
     nvic_irq_enable((uint8_t)USBHS0_WKUP_IRQn, 1U, 0U);
-#endif /* USE_USBHS0 */
+#endif // USE_USBHS0
 
 #ifdef USE_USBHS1
     /* USB wakeup EXTI line configuration */
@@ -131,7 +131,7 @@ void usb_intr_config() {
     exti_interrupt_enable(EXTI_32);
 
     nvic_irq_enable((uint8_t)USBHS1_WKUP_IRQn, 1U, 0U);
-#endif /* USE_USBHS1 */
+#endif // USE_USBHS1
 }
 
 void usb_vbus_config() {
@@ -144,7 +144,7 @@ void usb_vbus_config() {
     usb_vbus_drive(0U);
 
     usb_mdelay(200);
-#endif
+#endif // USB_HOST_VBUS_GPIOx
 }
 
 void pllusb_rcu_config(uint32_t usb_periph) {
@@ -185,19 +185,19 @@ void Init() {
 #ifdef USE_USBHS0
 #ifdef USE_USB_FS
     usb_para_init(&usbh_core, USBHS0, USB_SPEED_FULL);
-#endif
+#endif // USE_USB_FS
 #ifdef USE_USB_HS
     usb_para_init(&usbh_core, USBHS0, USB_SPEED_HIGH);
-#endif
-#endif /* USE_USBHS0 */
+#endif // USE_USB_HS
+#endif // USE_USBHS0
 #ifdef USE_USBHS1
 #ifdef USE_USB_FS
     usb_para_init(&usbh_core, USBHS1, USB_SPEED_FULL);
-#endif
+#endif // USE_USB_FS
 #ifdef USE_USB_HS
     usb_para_init(&usbh_core, USBHS1, USB_SPEED_HIGH);
-#endif
-#endif /* USE_USBHS1 */
+#endif // USE_USB_HS
+#endif // USE_USBHS1
     usbh_init(&usb_host, &usbh_core, &usr_cb);
 #ifdef USE_USB_HS
 #ifndef USE_ULPI_PHY
@@ -206,9 +206,9 @@ void Init() {
 #elif defined USE_USBHS1
     pllusb_rcu_config(USBHS1);
 #else
-#endif
-#endif /* !USE_ULPI_PHY */
-#endif /* USE_USB_HS */
+#endif // USE_USBHS0
+#endif // USE_ULPI_PHY
+#endif // USE_USB_HS
     usb_intr_config();
 }
 } // namespace usb
@@ -218,10 +218,10 @@ extern "C" {
 void USBHS0_IRQHandler(void) {
     usbh_isr(&usbh_core);
 }
-#endif /* USE_USBHS0 */
+#endif // USE_USBHS0
 #ifdef USE_USBHS1
 void USBHS1_IRQHandler(void) {
     usbh_isr(&usbh_core);
 }
-#endif /* USE_USBHS1 */
+#endif // USE_USBHS1
 }
