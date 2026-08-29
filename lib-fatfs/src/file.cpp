@@ -40,16 +40,16 @@
 #define POSIX_DEBUG_PUTS(...) DEBUG_PUTS(__VA_ARGS__)
 #else
 #define POSIX_DEBUG_ENTRY() \
-    do {                     \
-    } while (false)
-#define POSIX_DEBUG_EXIT() \
     do {                    \
     } while (false)
+#define POSIX_DEBUG_EXIT() \
+    do {                   \
+    } while (false)
 #define POSIX_DEBUG_PRINTF(...) \
-    do {                         \
+    do {                        \
     } while (false)
 #define POSIX_DEBUG_PUTS(...) \
-    do {                       \
+    do {                      \
     } while (false)
 #endif
 
@@ -58,35 +58,19 @@
 #endif
 
 namespace posix {
-static constexpr int OPEN_FILES_MAX = CONFIG_POSIX_OPEN_FILES_MAX;
+static constexpr int kOpenFilesMax = CONFIG_POSIX_OPEN_FILES_MAX;
 } // namespace posix
 
-#if defined(CONFIG_POSIX_ENABLE_STDIN)
-static FILE s_file[3 + posix::OPEN_FILES_MAX];
-FILE* stdin = &s_file[0];
-FILE* stdout = &s_file[1];
-FILE* stderr = &s_file[2];
-#else
-static FILE s_file[posix::OPEN_FILES_MAX];
-#endif
-static FIL s_ff_file[posix::OPEN_FILES_MAX];
+namespace {
+FILE s_file[posix::kOpenFilesMax];
+FIL s_ff_file[posix::kOpenFilesMax];
+FRESULT s_fresult;
 
-static FRESULT s_fresult;
-
-static int GetFileDescriptor() {
-    for (int nFile = 0; nFile < posix::OPEN_FILES_MAX; nFile++) {
-#if defined(CONFIG_POSIX_ENABLE_STDIN)
-        if (isatty(nFile)) {
-            continue;
-        }
-#endif
-        if (s_file[nFile].udata == nullptr) {
-#if defined(CONFIG_POSIX_ENABLE_STDIN)
-            s_file[nFile].udata = &s_ff_file[nFile - 3];
-#else
-            s_file[nFile].udata = &s_ff_file[nFile];
-#endif
-            return nFile;
+int GetFileDescriptor() {
+    for (int file_descriptor = 0; file_descriptor < posix::kOpenFilesMax; file_descriptor++) {
+        if (s_file[file_descriptor].udata == nullptr) {
+            s_file[file_descriptor].udata = &s_ff_file[file_descriptor];
+            return file_descriptor;
         }
     }
 
@@ -94,8 +78,10 @@ static int GetFileDescriptor() {
     return -1;
 }
 
-static int FatfsToErrno(const BYTE err) {
-    switch (static_cast<FRESULT>(err)) {
+int FatfsToErrno(BYTE error) {
+    POSIX_DEBUG_PRINTF("s_fresult=%d", static_cast<int>(s_fresult));
+
+    switch (static_cast<FRESULT>(error)) {
         case FR_OK:                  /* FatFS (0) Succeeded */
             return (0);              /* POSIX OK */
         case FR_DISK_ERR:            /* FatFS (1) A hard error occurred in the low level disk I/O layer */
@@ -140,6 +126,7 @@ static int FatfsToErrno(const BYTE err) {
 
     return (EBADMSG); /* POSIX Bad message (POSIX.1) */
 }
+} // namespace
 
 extern "C" {
 int fileno(FILE* stream) {
@@ -148,9 +135,9 @@ int fileno(FILE* stream) {
         return -1;
     }
 
-    for (int nFile = 0; nFile < posix::OPEN_FILES_MAX; nFile++) {
-        if (&s_file[nFile] == stream) {
-            return nFile;
+    for (int file_no = 0; file_no < posix::kOpenFilesMax; file_no++) {
+        if (&s_file[file_no] == stream) {
+            return file_no;
         }
     }
 
@@ -165,20 +152,21 @@ FILE* fopen(const char* path, const char* mode) {
     POSIX_DEBUG_PRINTF("%s %s", path, mode);
 
     errno = 0;
-    BYTE fm, fo;
+    BYTE file_mode;
+    BYTE file_option;
 
     switch (mode[0]) {
         case 'r':
-            fm = (BYTE)FA_READ;
-            fo = 0;
+            file_mode = (BYTE)FA_READ;
+            file_option = 0;
             break;
         case 'w':
-            fm = (BYTE)FA_WRITE;
-            fo = (BYTE)FA_CREATE_ALWAYS;
+            file_mode = (BYTE)FA_WRITE;
+            file_option = (BYTE)FA_CREATE_ALWAYS;
             break;
         case 'a':
-            fm = (BYTE)FA_WRITE;
-            fo = (BYTE)FA_OPEN_APPEND;
+            file_mode = (BYTE)FA_WRITE;
+            file_option = (BYTE)FA_OPEN_APPEND;
             break;
         default:
             return nullptr;
@@ -188,10 +176,10 @@ FILE* fopen(const char* path, const char* mode) {
     while (*++mode != '\0') {
         switch (*mode) {
             case '+':
-                fm = (BYTE)(FA_READ | FA_WRITE);
+                file_mode = (BYTE)(FA_READ | FA_WRITE);
                 break;
             case 'x':
-                fo = (BYTE)FA_CREATE_NEW;
+                file_option = (BYTE)FA_CREATE_NEW;
                 break;
             default:
                 return nullptr;
@@ -207,17 +195,17 @@ FILE* fopen(const char* path, const char* mode) {
         return nullptr;
     }
 
-    s_fresult = f_open(&s_ff_file[fd], (TCHAR*)path, (BYTE)(fm | fo));
+    s_fresult = f_open(&s_ff_file[fd], (TCHAR*)path, (BYTE)(file_mode | file_option));
     errno = FatfsToErrno(s_fresult);
 
     POSIX_DEBUG_PRINTF("errno=%d", errno);
 
     if (s_fresult == FR_OK) {
         return &s_file[fd];
-    } else {
-        s_file[fd].udata = nullptr;
-        return nullptr;
     }
+
+    s_file[fd].udata = nullptr;
+    return nullptr;
 }
 
 int fclose(FILE* stream) {
@@ -419,13 +407,14 @@ static dirent_t s_dirent;
 DIR* opendir([[maybe_unused]] const char* dirname) {
 #if !defined(CONFIG_FS_ENABLE_WRITE)
     errno = ENOSYS;
+    POSIX_DEBUG_EXIT();
     return nullptr;
 #else
-    const auto len = strlen(dirname);
+    const auto kLen = strlen(dirname);
 
-    if ((len > 0) && (dirname[len - 1] == '.')) {
+    if ((kLen > 0) && (dirname[kLen - 1] == '.')) {
         char* pathdir = (char*)dirname;
-        pathdir[len - 1] = '\0';
+        pathdir[kLen - 1] = '\0';
         s_fresult = f_opendir(&s_dir, pathdir);
     } else {
         s_fresult = f_opendir(&s_dir, dirname);
