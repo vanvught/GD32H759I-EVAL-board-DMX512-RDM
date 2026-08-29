@@ -1,8 +1,8 @@
 /**
- * @file json_debug.h
+ * @file utils_units.h
  *
  */
-/* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2025-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,27 +23,19 @@
  * THE SOFTWARE.
  */
 
-#ifndef JSON_JSON_DEBUG_H_
-#define JSON_JSON_DEBUG_H_
+#ifndef COMMON_UTILS_UTILS_UNITS_H_
+#define COMMON_UTILS_UTILS_UNITS_H_
 
-#ifdef DEBUG_JSON
-#define JSON_DEBUG_ENTRY() DEBUG_ENTRY()
-#define JSON_DEBUG_EXIT() DEBUG_EXIT()
-#define JSON_DEBUG_PRINTF(...) DEBUG_PRINTF(__VA_ARGS__)
-#define JSON_DEBUG_PUTS(...) DEBUG_PUTS(__VA_ARGS__)
-#else
-#define JSON_DEBUG_ENTRY() \
-    do {                     \
-    } while (false)
-#define JSON_DEBUG_EXIT() \
-    do {                    \
-    } while (false)
-#define JSON_DEBUG_PRINTF(...) \
-    do {                         \
-    } while (false)
-#define JSON_DEBUG_PUTS(...) \
-    do {                       \
-    } while (false)
-#endif // DEBUG_JSON
+#include <cstdint>
 
-#endif // JSON_JSON_DEBUG_H_
+namespace common::units {
+inline constexpr uint32_t kUsPerMs = 1'000U;
+inline constexpr uint32_t kMsPerSecond = 1'000U;
+inline constexpr uint32_t kUsPerSecond = 1'000'000U;
+
+inline constexpr uint32_t kNsPerUs = 1'000U;
+inline constexpr uint32_t kNsPerMs = 1'000'000U;
+inline constexpr uint32_t kNsPerSecond = 1'000'000'000U;
+} // namespace common::units
+
+#endif // COMMON_UTILS_UTILS_UNITS_H_
