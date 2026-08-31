@@ -78,7 +78,7 @@ int stat(const char* path, struct stat* buf) { // NOLINT
         return -1; // POSIX returns -1 on error
     }
 
-    buf->st_size = fno.fsize; // File size mapping
+    buf->st_size = static_cast<off_t>(fno.fsize);
 
     auto epoch = FatTimeToUnix(fno.fdate, fno.ftime);
     buf->st_mtime = epoch;
