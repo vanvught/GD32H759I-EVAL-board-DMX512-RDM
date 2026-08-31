@@ -1,5 +1,5 @@
 /**
- * @file get_fattime.cpp
+ * @file drivesize.cpp
  *
  */
 /* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
@@ -23,23 +23,30 @@
  * THE SOFTWARE.
  */
 
-#include <time.h>
+#include <cstdint>
 
-extern "C" {
 #include "ff14b/source/ff.h"
 
-DWORD get_fattime() { // NOLINT
-    auto ltime = time(nullptr);
-    auto* local_time = gmtime(&ltime);
+void DriveSize(const char* path, uint32_t& total_bytes, uint32_t& free_bytes) {
+    FATFS* fat_fs;
+    DWORD fre_clust;
+    FRESULT res;
 
-    const auto kYear = ((DWORD)(local_time->tm_year - 80)) & 0x7F; // 7 bits (0-127)
-    const auto kMonth = ((DWORD)(local_time->tm_mon + 1)) & 0x0F;  // 4 bits (1-12)
-    const auto kDay = ((DWORD)local_time->tm_mday) & 0x1F;         // 5 bits (1-31)
-    const auto kHour = ((DWORD)local_time->tm_hour) & 0x1F;        // 5 bits (0-23)
-    const auto kMin = ((DWORD)local_time->tm_min) & 0x3F;          // 6 bits (0-59)
-    const auto kSec = ((DWORD)(local_time->tm_sec >> 1)) & 0x1F;   // 5 bits (0-29)
-    
-    const auto kPacked =  (kYear << 25) | (kMonth << 21) | (kDay << 16) | (kHour << 11) | (kMin << 5) | kSec;
-    return kPacked;
-}
+    // Get volume information and free clusters
+    res = f_getfree(reinterpret_cast<const TCHAR*>(path), &fre_clust, &fat_fs);
+
+    if (res == FR_OK) {
+        // 1. Calculate total and free sectors
+        DWORD total_sectors = (fat_fs->n_fatent - 2) * fat_fs->csize;
+        DWORD free_sectors = fre_clust * fat_fs->csize;
+
+        // 2. Determine sector size (handle variable sector size configs)
+#if FF_MAX_SS == FF_MIN_SS
+        WORD sector_size = FF_MIN_SS; // Usually 512 bytes
+#else
+        WORD sector_size = fs->ssize;
+#endif // FF_MAX_SS == FF_MIN_SS
+        total_bytes = static_cast<uint32_t>(total_sectors) * sector_size;
+        free_bytes = static_cast<uint32_t>(free_sectors) * sector_size;
+    }
 }

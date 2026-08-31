@@ -2,7 +2,7 @@
  * @file file.cpp
  *
  */
-/* Copyright (C) 2017-2024 by Arjan van Vught mailto:info@orangepi-dmx.nl
+/* Copyright (C) 2017-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,15 @@
  * THE SOFTWARE.
  */
 
-#include <stddef.h>
+#include <cstddef>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
 #include <assert.h>
 #include <dirent.h>
 
-#include "../ff14b/source/ff.h"
-#include "firmware/debug/debug_debug.h"
+#include "ff14b/source/ff.h"
+#include "firmware/debug/debug_debug.h" // IWYU pragma: keep
 
 #ifdef DEBUG_POSIX
 #define POSIX_DEBUG_ENTRY() DEBUG_ENTRY()
@@ -51,23 +51,20 @@
 #define POSIX_DEBUG_PUTS(...) \
     do {                      \
     } while (false)
-#endif
+#endif // DEBUG_POSIX
 
 #if !defined(CONFIG_POSIX_OPEN_FILES_MAX) || (CONFIG_POSIX_OPEN_FILES_MAX < 1)
 #define CONFIG_POSIX_OPEN_FILES_MAX 2
-#endif
-
-namespace posix {
-static constexpr int kOpenFilesMax = CONFIG_POSIX_OPEN_FILES_MAX;
-} // namespace posix
+#endif // !defined(CONFIG_POSIX_OPEN_FILES_MAX) || (CONFIG_POSIX_OPEN_FILES_MAX < 1)
 
 namespace {
-FILE s_file[posix::kOpenFilesMax];
-FIL s_ff_file[posix::kOpenFilesMax];
+constexpr int kOpenFilesMax = CONFIG_POSIX_OPEN_FILES_MAX;
+FILE s_file[kOpenFilesMax];
+FIL s_ff_file[kOpenFilesMax];
 FRESULT s_fresult;
 
 int GetFileDescriptor() {
-    for (int file_descriptor = 0; file_descriptor < posix::kOpenFilesMax; file_descriptor++) {
+    for (int file_descriptor = 0; file_descriptor < kOpenFilesMax; file_descriptor++) {
         if (s_file[file_descriptor].udata == nullptr) {
             s_file[file_descriptor].udata = &s_ff_file[file_descriptor];
             return file_descriptor;
@@ -129,13 +126,13 @@ int FatfsToErrno(BYTE error) {
 } // namespace
 
 extern "C" {
-int fileno(FILE* stream) {
+int fileno(FILE* stream) { // NOLINT
     if (stream == nullptr) {
         errno = EBADF;
         return -1;
     }
 
-    for (int file_no = 0; file_no < posix::kOpenFilesMax; file_no++) {
+    for (int file_no = 0; file_no < kOpenFilesMax; file_no++) {
         if (&s_file[file_no] == stream) {
             return file_no;
         }
@@ -145,7 +142,7 @@ int fileno(FILE* stream) {
 }
 
 // http://elm-chan.org/fsw/ff/doc/open.html
-FILE* fopen(const char* path, const char* mode) {
+FILE* fopen(const char* path, const char* mode) { // NOLINT
     assert(path != nullptr);
     assert(mode != nullptr);
 
@@ -187,38 +184,38 @@ FILE* fopen(const char* path, const char* mode) {
         }
     }
 
-    const auto fd = GetFileDescriptor();
-    POSIX_DEBUG_PRINTF("fd=%d", fd);
+    const auto kFd = GetFileDescriptor();
+    POSIX_DEBUG_PRINTF("kFd=%d", kFd);
 
-    if (fd < 0) {
+    if (kFd < 0) {
         errno = EBADF;
         return nullptr;
     }
 
-    s_fresult = f_open(&s_ff_file[fd], (TCHAR*)path, (BYTE)(file_mode | file_option));
+    s_fresult = f_open(&s_ff_file[kFd], (TCHAR*)path, (BYTE)(file_mode | file_option));
     errno = FatfsToErrno(s_fresult);
 
     POSIX_DEBUG_PRINTF("errno=%d", errno);
 
     if (s_fresult == FR_OK) {
-        return &s_file[fd];
+        return &s_file[kFd];
     }
 
-    s_file[fd].udata = nullptr;
+    s_file[kFd].udata = nullptr;
     return nullptr;
 }
 
-int fclose(FILE* stream) {
+int fclose(FILE* stream) { // NOLINT
     errno = 0;
 
     if (stream == nullptr) {
         return 0;
     }
 
-    const auto fd = fileno(stream);
-    POSIX_DEBUG_PRINTF("fd=%d", fd);
+    const auto kFd = fileno(stream);
+    POSIX_DEBUG_PRINTF("kFd=%d", kFd);
 
-    if (fd < 0) {
+    if (kFd < 0) {
         errno = EBADF;
         return EOF;
     }
@@ -237,8 +234,7 @@ int fclose(FILE* stream) {
     return EOF;
 }
 
-int fgetc(FILE* stream) {
-    char c;
+int fgetc(FILE* stream) { // NOLINT
     UINT bytes_read;
     errno = 0;
 
@@ -246,9 +242,12 @@ int fgetc(FILE* stream) {
         return EOF;
     }
 
-    if ((s_fresult = f_read((FIL*)stream->udata, &c, (UINT)1, &bytes_read)) == FR_OK) {
+    char buffer;
+    s_fresult = f_read(reinterpret_cast<FIL*>(stream->udata), &buffer, static_cast<UINT>(1), &bytes_read);
+
+    if (s_fresult == FR_OK) {
         if (bytes_read > 0) {
-            return c;
+            return buffer;
         }
 
         if (bytes_read < 1) {
@@ -262,7 +261,7 @@ int fgetc(FILE* stream) {
     return EOF;
 }
 
-size_t fread(void* ptr, size_t size, size_t nmemb, FILE* stream) {
+size_t fread(void* ptr, size_t size, size_t nmemb, FILE* stream) { // NOLINT
     UINT bytes_read;
 
     s_fresult = f_read((FIL*)stream->udata, ptr, (size * nmemb), &bytes_read);
@@ -275,7 +274,7 @@ size_t fread(void* ptr, size_t size, size_t nmemb, FILE* stream) {
     return 0;
 }
 
-int fseek(FILE* stream, long offset, int whence) {
+int fseek(FILE* stream, long offset, int whence) { // NOLINT
     if (whence == SEEK_SET) {
         s_fresult = f_lseek((FIL*)stream->udata, (FSIZE_t)offset);
     } else if (whence == SEEK_END) {
@@ -291,47 +290,45 @@ int fseek(FILE* stream, long offset, int whence) {
     return -1;
 }
 
-long ftell(FILE* stream) {
+long ftell(FILE* stream) { // NOLINT
     return (long)f_tell((FIL*)stream->udata);
 }
 
-char* fgets(char* s, int size, FILE* stream) {
-    assert(s != nullptr);
+char* fgets(char* string, int size, FILE* stream) { // NOLINT
+    assert(string != nullptr);
     errno = 0;
 
     if (stream == nullptr) {
-        *s = '\0';
+        *string = '\0';
         return nullptr;
     }
 
-    if (f_gets(s, size, (FIL*)stream->udata) != s) {
-        *s = '\0';
+    if (f_gets(string, size, (FIL*)stream->udata) != string) {
+        *string = '\0';
         errno = FatfsToErrno(f_error((FIL*)stream->udata));
         return nullptr;
     }
 
-    return s;
+    return string;
 }
 
-void clearerr(FILE* stream) {
+void clearerr(FILE* stream) { // NOLINT
     stream->flags &= static_cast<uint8_t>(~__SEOF);
     stream->flags &= static_cast<uint8_t>(~__SERR);
 }
 
-int ferror(FILE* stream) {
-    return (stream->flags & __SERR) ? 1 : 0;
+int ferror(FILE* stream) { // NOLINT
+    return (stream->flags & __SERR) == __SERR ? 1 : 0;
 }
 
-int feof(FILE* stream) {
-    return (stream->flags & __SEOF) ? 1 : 0;
+int feof(FILE* stream) { // NOLINT
+    return (stream->flags & __SEOF) == __SEOF ? 1 : 0;
 }
 
-/*
- *  The following API´s are implemented when CONFIG_FS_ENABLE_WRITE is defined
- */
+// The following API´s are implemented when CONFIG_FS_ENABLE_WRITE is defined
 
-int fputs([[maybe_unused]] const char* s, [[maybe_unused]] FILE* stream) {
-#if !defined(CONFIG_FS_ENABLE_WRITE)
+int fputs([[maybe_unused]] const char* s, [[maybe_unused]] FILE* stream) { // NOLINT
+#ifndef CONFIG_FS_ENABLE_WRITE
     errno = ENOSYS;
     return -1;
 #else
@@ -340,11 +337,11 @@ int fputs([[maybe_unused]] const char* s, [[maybe_unused]] FILE* stream) {
     errno = 0;
 
     return f_puts(s, (FIL*)stream->udata);
-#endif
+#endif // CONFIG_FS_ENABLE_WRITE
 }
 
 size_t fwrite([[maybe_unused]] const void* ptr, [[maybe_unused]] size_t size, [[maybe_unused]] size_t nmemb, [[maybe_unused]] FILE* stream) {
-#if !defined(CONFIG_FS_ENABLE_WRITE)
+#ifndef CONFIG_FS_ENABLE_WRITE
     errno = ENOSYS;
     return 0;
 #else
@@ -359,11 +356,11 @@ size_t fwrite([[maybe_unused]] const void* ptr, [[maybe_unused]] size_t size, [[
     }
 
     return 0;
-#endif
+#endif // CONFIG_FS_ENABLE_WRITE
 }
 
-int fputc([[maybe_unused]] int c, [[maybe_unused]] FILE* stream) {
-#if !defined(CONFIG_FS_ENABLE_WRITE)
+int fputc([[maybe_unused]] int c, [[maybe_unused]] FILE* stream) { // NOLINT
+#ifndef CONFIG_FS_ENABLE_WRITE
     errno = ENOSYS;
     return 0;
 #else
@@ -379,11 +376,11 @@ int fputc([[maybe_unused]] int c, [[maybe_unused]] FILE* stream) {
     }
 
     return 0;
-#endif
+#endif // CONFIG_FS_ENABLE_WRITE
 }
 
-int unlink([[maybe_unused]] const char* pathname) {
-#if !defined(CONFIG_FS_ENABLE_WRITE)
+int unlink([[maybe_unused]] const char* pathname) { // NOLINT
+#ifndef CONFIG_FS_ENABLE_WRITE
     errno = ENOSYS;
     return -1;
 #else
@@ -395,17 +392,17 @@ int unlink([[maybe_unused]] const char* pathname) {
     }
 
     return -1;
-#endif
+#endif // CONFIG_FS_ENABLE_WRITE
 }
 
-#if !defined(CONFIG_FS_ENABLE_WRITE)
+#ifndef CONFIG_FS_ENABLE_WRITE
 #else
 static DIR s_dir;
 static dirent_t s_dirent;
-#endif
+#endif // CONFIG_FS_ENABLE_WRITE
 
 DIR* opendir([[maybe_unused]] const char* dirname) {
-#if !defined(CONFIG_FS_ENABLE_WRITE)
+#ifndef CONFIG_FS_ENABLE_WRITE
     errno = ENOSYS;
     POSIX_DEBUG_EXIT();
     return nullptr;
@@ -427,7 +424,7 @@ DIR* opendir([[maybe_unused]] const char* dirname) {
     }
 
     return &s_dir;
-#endif
+#endif // CONFIG_FS_ENABLE_WRITE
 }
 
 /**
@@ -437,7 +434,7 @@ DIR* opendir([[maybe_unused]] const char* dirname) {
  */
 
 struct dirent* readdir([[maybe_unused]] DIR* dirp) {
-#if !defined(CONFIG_FS_ENABLE_WRITE)
+#ifndef CONFIG_FS_ENABLE_WRITE
     errno = ENOSYS;
     return nullptr;
 #else
@@ -467,11 +464,11 @@ struct dirent* readdir([[maybe_unused]] DIR* dirp) {
     }
 
     return &s_dirent;
-#endif
+#endif // CONFIG_FS_ENABLE_WRITE
 }
 
 int closedir([[maybe_unused]] DIR* dirp) {
-#if !defined(CONFIG_FS_ENABLE_WRITE)
+#ifndef CONFIG_FS_ENABLE_WRITE
     errno = ENOSYS;
     return -1;
 #else
@@ -483,6 +480,6 @@ int closedir([[maybe_unused]] DIR* dirp) {
     }
 
     return -1;
-#endif
+#endif // CONFIG_FS_ENABLE_WRITE
 }
 }
