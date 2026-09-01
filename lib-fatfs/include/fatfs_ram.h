@@ -1,9 +1,8 @@
-#if !defined(ENABLE_TFTP_SERVER)
 /**
- * @file remoteconfig.cpp
+ * @file fatfs_ram.h
  *
  */
-/* Copyright (C) 2022-2026 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,32 +23,11 @@
  * THE SOFTWARE.
  */
 
-#include "remoteconfig.h"
-#include "display.h"
-#include "gd32.h"
-#include "firmware/ansi_colour.h"
-#include "firmware/debug/debug_debug.h"
+#ifndef FATFS_RAM_H_
+#define FATFS_RAM_H_
 
-void RemoteConfig::PlatformHandleTftpSet() {
-    DEBUG_ENTRY();
-
-    if (enable_tftp_) {
-        bkp_data_write(BKP_DATA_1, 0xA5A5);
-        Display::Get()->TextStatus("TFTP On ", ansi::Colours::Colour::kGreen);
-    } else {
-        bkp_data_write(BKP_DATA_1, 0x0);
-        Display::Get()->TextStatus("TFTP Off", ansi::Colours::Colour::kGreen);
-    }
-
-    DEBUG_EXIT();
+namespace fatfs::ram {
+void Init();
 }
 
-void RemoteConfig::PlatformHandleTftpGet() {
-    DEBUG_ENTRY();
-
-    enable_tftp_ = (bkp_data_read(BKP_DATA_1) == 0xA5A5);
-
-    DEBUG_PRINTF("enable_tftp_=%d", enable_tftp_);
-    DEBUG_EXIT();
-}
-#endif
+#endif // FATFS_RAM_H_

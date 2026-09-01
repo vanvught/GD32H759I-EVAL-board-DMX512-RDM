@@ -33,7 +33,7 @@
 /* This option switches filtered directory read functions, f_findfirst() and
 /  f_findnext(). (0:Disable, 1:Enable 2:Enable with matching altname[] too) */
 
-#if defined (CONFIG_FS_FATFS)
+#if defined (CONFIG_FATFS_MKFS)
 #define FF_USE_MKFS   1
 #else
 #define FF_USE_MKFS		0
