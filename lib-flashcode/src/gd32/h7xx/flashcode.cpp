@@ -2,7 +2,7 @@
  * @file flashcode.cpp
  *
  */
-/* Copyright (C) 2024 by Arjan van Vught mailto:info@gd32-dmx.org
+/* Copyright (C) 2024-2026 by Arjan van Vught mailto:info@gd32-dmx.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+ 
+ #undef NDEBUG
 
 #include <cstdint>
 #include <cstring>
@@ -43,7 +45,7 @@ State s_state = State::kIdle;
 uint32_t s_page;
 uint32_t s_length;
 uint32_t s_address;
-uint32_t* s_data;
+const uint32_t* s_data;
 } // namespace
 
 using flashcode::Result;
@@ -59,7 +61,7 @@ uint32_t FlashCode::GetSectorSize() const {
 
 bool FlashCode::Read(uint32_t offset, std::span<uint8_t> buffer, Result& result) {
     DEBUG_ENTRY();
-    DEBUG_PRINTF("offset=%x, len=%u, data=%p", static_cast<unsigned>(offset), static_cast<unsigned>(buffer.size()), buffer.data());
+    DEBUG_PRINTF("offset=%x, len=%u, data=%p", static_cast<unsigned>(offset), buffer.size(), buffer.data());
 
     assert((buffer.size() & 0x3U) == 0);
     assert((reinterpret_cast<uintptr_t>(buffer.data()) & 0x3U) == 0);
