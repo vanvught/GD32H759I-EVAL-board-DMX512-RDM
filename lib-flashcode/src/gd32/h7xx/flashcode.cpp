@@ -22,8 +22,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
- #undef NDEBUG
 
 #include <cstdint>
 #include <cstring>
@@ -39,7 +37,7 @@ constexpr auto kFlashSectorSize = 4096U;
 // The flash page size is 4KB for bank1
 constexpr auto kBanK1FlashPage = (4U * 1024U);
 
-enum class State { kIdle, kEraseBusy, kEraseProgam, kWriteBusy, kWriteProgram, kError };
+enum class State { kIdle, kEraseBusy, kEraseProgram, kWriteBusy, kWriteProgram, kError };
 
 State s_state = State::kIdle;
 uint32_t s_page;
@@ -110,11 +108,11 @@ bool FlashCode::Erase(uint32_t offset, uint32_t length, flashcode::Result& resul
                 return true;
             }
 
-            s_state = State::kEraseProgam;
+            s_state = State::kEraseProgram;
             DEBUG_EXIT();
             return false;
             break;
-        case State::kEraseProgam:
+        case State::kEraseProgram:
             if (s_length > 0) {
                 DEBUG_PRINTF("s_page=%p", reinterpret_cast<void*>(s_page));
 
