@@ -1,5 +1,5 @@
 /**
- * @file flashcode.cpp
+ * @file gd32_fmc.cpp
  *
  */
 /* Copyright (C) 2024-2026 by Arjan van Vught mailto:info@gd32-dmx.org
@@ -24,18 +24,18 @@
  */
 
 #include <cstdint>
-#include <cstring>
+#include <span>
 #include <cassert>
 
-#include "flashcode.h"
+#include "gd32_fmc.h"
+#include "gd32_debug.h"
 #include "gd32.h" // IWYU pragma: keep
-#include "firmware/debug/debug_debug.h"
 
 namespace {
-// Backwards compatibility with SPI FLASH
-constexpr auto kFlashSectorSize = 4096U;
-// The flash page size is 4KB for bank1
-constexpr auto kBanK1FlashPage = (4U * 1024U);
+constexpr uint32_t k1KiB = 1024;
+constexpr uint32_t kStartAddress = FLASH_BASE;
+const auto kEndAddress = (kStartAddress + (FMC_SIZE * 1024) - 1);
+constexpr auto kBanK1FlashPage = 4 * k1KiB;
 
 enum class State { kIdle, kEraseBusy, kEraseProgram, kWriteBusy, kWriteProgram, kError };
 
@@ -46,75 +46,95 @@ uint32_t s_address;
 const uint32_t* s_data;
 } // namespace
 
-using flashcode::Result;
+namespace gd32::fmc {
+// Blocking API's
+bool Read(uint32_t offset, std::span<uint8_t> buffer) {
+    GD32_FMC_DEBUG_ENTRY();
 
-uint32_t FlashCode::GetSize() const {
-    const auto kFlashDensity = ((REG32(0x1FF0F7E0) >> 16) & 0xFFFF) * 1024U;
-    return kFlashDensity;
-}
+    const auto kAddress = offset + FLASH_BASE;
 
-uint32_t FlashCode::GetSectorSize() const {
-    return kFlashSectorSize;
-}
+    if (buffer.empty() || ((buffer.size() % sizeof(uint32_t)) != 0) || (kAddress < kStartAddress) || (kAddress >= kEndAddress) || (buffer.size() > (kEndAddress - kAddress))) {
+        return false;
+    }
 
-bool FlashCode::Read(uint32_t offset, std::span<uint8_t> buffer, Result& result) {
-    DEBUG_ENTRY();
-    DEBUG_PRINTF("offset=%x, len=%u, data=%p", static_cast<unsigned>(offset), buffer.size(), buffer.data());
+    assert((reinterpret_cast<uintptr_t>(buffer.data()) % alignof(uint32_t)) == 0);
 
-    assert((buffer.size() & 0x3U) == 0);
-    assert((reinterpret_cast<uintptr_t>(buffer.data()) & 0x3U) == 0);
+    GD32_FMC_DEBUG_PRINTF("offset=%x, length=%u, data=%p", static_cast<unsigned>(offset), buffer.size(), buffer.data());
 
-    const auto* src = reinterpret_cast<const uint32_t*>(offset + FLASH_BASE);
+    const auto* src = reinterpret_cast<const uint32_t*>(kAddress);
     auto* dst = reinterpret_cast<uint32_t*>(buffer.data());
 
     auto length = buffer.size();
 
-    while (length >= sizeof(uint32_t)) {
+    while (length != 0) {
         *dst++ = *src++;
         length -= sizeof(uint32_t);
     }
 
-    result = Result::kOk;
-
-    DEBUG_EXIT();
+    GD32_FMC_DEBUG_EXIT();
     return true;
 }
 
-bool FlashCode::Erase(uint32_t offset, uint32_t length, flashcode::Result& result) {
-    DEBUG_ENTRY();
-    DEBUG_PRINTF("State=%d", static_cast<int>(s_state));
+bool Erase(uint32_t offset, uint32_t length) {
+    GD32_FMC_DEBUG_ENTRY();
+
+    Result result;
+    while (!Erase(offset, length, result)) {
+    }
+
+    GD32_FMC_DEBUG_EXIT();
+    return result == Result::kOk;
+}
+
+bool Write(uint32_t offset, std::span<const uint8_t> buffer) {
+    GD32_FMC_DEBUG_ENTRY();
+
+    Result result;
+    while (!Write(offset, buffer, result)) {
+    }
+
+    GD32_FMC_DEBUG_EXIT();
+    return result == Result::kOk;
+}
+
+// State-machine API's
+bool Erase(uint32_t offset, uint32_t length, Result& result) {
+    GD32_FMC_DEBUG_ENTRY();
+    GD32_FMC_DEBUG_PRINTF("State=%d", static_cast<int>(s_state));
 
     result = Result::kOk;
 
     switch (s_state) {
         case State::kIdle:
+            GD32_FMC_DEBUG_ENTRY();
+            GD32_FMC_DEBUG_PUTS("State::IDLE");
+
             s_page = offset + FLASH_BASE;
             s_length = length;
             fmc_unlock();
             s_state = State::kEraseBusy;
-            DEBUG_EXIT();
+
             return false;
-            break;
+
         case State::kEraseBusy:
             if (SET == fmc_flag_get(FMC_FLAG_BUSY)) {
-                DEBUG_EXIT();
                 return false;
             }
 
             if (s_length == 0) {
-                s_state = State::kIdle;
                 fmc_lock();
-                DEBUG_EXIT();
-                return true;
+                s_state = State::kIdle;
+
+                GD32_FMC_DEBUG_EXIT();
+                return true; // Ending state-machine
             }
 
             s_state = State::kEraseProgram;
-            DEBUG_EXIT();
             return false;
-            break;
+
         case State::kEraseProgram:
             if (s_length > 0) {
-                DEBUG_PRINTF("s_page=%p", reinterpret_cast<void*>(s_page));
+                GD32_FMC_DEBUG_PRINTF("s_page=%p", reinterpret_cast<void*>(s_page));
 
                 fmc_sector_erase(s_page);
 
@@ -123,9 +143,8 @@ bool FlashCode::Erase(uint32_t offset, uint32_t length, flashcode::Result& resul
             }
 
             s_state = State::kEraseBusy;
-            DEBUG_EXIT();
             return false;
-            break;
+
         default:
             assert(0);
             __builtin_unreachable();
@@ -137,22 +156,25 @@ bool FlashCode::Erase(uint32_t offset, uint32_t length, flashcode::Result& resul
     return true;
 }
 
-bool FlashCode::Write(uint32_t offset, std::span<const uint8_t> buffer, flashcode::Result& result) {
-    if ((s_state == State::kWriteProgram) || (s_state == State::kWriteBusy)) {
-    } else {
-        DEBUG_ENTRY();
-    }
-
+bool Write(uint32_t offset, std::span<const uint8_t> buffer, Result& result) {
     result = Result::kOk;
 
     switch (s_state) {
-        case State::kIdle:
-            DEBUG_PUTS("State::IDLE");
+        case State::kIdle: {
+            GD32_FMC_DEBUG_ENTRY();
+            GD32_FMC_DEBUG_PUTS("State::IDLE");
 
-            assert((buffer.size() & 0x3U) == 0);
-            assert((reinterpret_cast<uintptr_t>(buffer.data()) & 0x3U) == 0);
+            const auto kAddress = offset + FLASH_BASE;
 
-            s_address = offset + FLASH_BASE;
+            if (buffer.empty() || ((buffer.size() % sizeof(uint32_t)) != 0) || (kAddress < kStartAddress) || (kAddress >= kEndAddress) || (buffer.size() > (kEndAddress - kAddress))) {
+                result = Result::kError;
+                GD32_FMC_DEBUG_EXIT();
+                return true; // Ending state-machine
+            }
+
+            assert((reinterpret_cast<uintptr_t>(buffer.data()) % alignof(uint32_t)) == 0);
+
+            s_address = kAddress;
             s_data = reinterpret_cast<const uint32_t*>(buffer.data());
             s_length = static_cast<uint32_t>(buffer.size());
 
@@ -160,56 +182,51 @@ bool FlashCode::Write(uint32_t offset, std::span<const uint8_t> buffer, flashcod
 
             s_state = State::kWriteBusy;
 
-            DEBUG_EXIT();
             return false;
+        }
 
         case State::kWriteBusy:
             if (SET == fmc_flag_get(FMC_FLAG_BUSY)) {
-                DEBUG_EXIT();
                 return false;
             }
+
+            FMC_CTL &= ~FMC_CTL_PG;
 
             if (s_length == 0) {
                 fmc_lock();
                 s_state = State::kIdle;
 
-                if (memcmp(reinterpret_cast<void*>(offset + FLASH_BASE), buffer.data(), buffer.size()) == 0) {
-                    DEBUG_PUTS("memcmp OK");
-                } else {
-                    DEBUG_PUTS("memcmp failed");
-                }
-
-                DEBUG_EXIT();
-                return true;
+                GD32_FMC_DEBUG_EXIT();
+                return true; // Ending state-machine
             }
 
+            s_address += sizeof(uint32_t);
             s_state = State::kWriteProgram;
             return false;
 
         case State::kWriteProgram:
-            if (s_length >= sizeof(uint32_t)) {
-                if (FMC_READY == fmc_ready_wait(0xFF)) {
-                    FMC_CTL |= FMC_CTL_PG;
+            FMC_CTL |= FMC_CTL_PG;
 
-                    __ISB();
-                    __DSB();
+            __ISB();
+            __DSB();
 
-                    REG32(s_address) = *s_data;
+            REG32(s_address) = *s_data;
 
-                    __ISB();
-                    __DSB();
+            __ISB();
+            __DSB();
 
-                    FMC_CTL &= ~FMC_CTL_PG;
-
-                    ++s_data;
-                    s_address += sizeof(uint32_t);
-                    s_length -= sizeof(uint32_t);
-                }
-            } else if (s_length > 0) {
-                DEBUG_PUTS("Error!");
-            }
+            ++s_data;
+            s_length -= sizeof(uint32_t);
 
             s_state = State::kWriteBusy;
+            return false;
+
+        case State::kEraseBusy:
+            /*@fallthrough@*/
+            /* no break */
+
+        case State::kEraseProgram:
+            s_state = State::kIdle;
             return false;
 
         default:
@@ -217,3 +234,4 @@ bool FlashCode::Write(uint32_t offset, std::span<const uint8_t> buffer, flashcod
             __builtin_unreachable();
     }
 }
+} // namespace gd32::fmc
