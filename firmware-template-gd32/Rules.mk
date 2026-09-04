@@ -21,7 +21,8 @@ BUILD=build_gd32/
 
 FIRMWARE_DIR=./../firmware-template-gd32/
 
-DEFINES:=$(addprefix -D,$(DEFINES))
+DEFINES:=$(addprefix -D,$(DEFINES)) 
+DEFINES+=-DPHY_TYPE=$(ENET_PHY)
 
 include ../common/make/gd32/Board.mk
 include ../common/make/gd32/Mcu.mk
@@ -62,7 +63,7 @@ DEFINES+=-DUSE_ENET0
 DEFINES+=-DUSE_USB_HS
 DEFINES+=-DUSE_USBHS1
 
-COPS=-DGD32 -D$(FAMILY_UCA) -D$(LINE_UC) -D$(MCU) -D$(BOARD) -DPHY_TYPE=$(ENET_PHY)
+COPS=-DGD32 -D$(FAMILY_UCA) -D$(LINE_UC) -D$(MCU) -D$(BOARD)
 COPS+=$(strip $(DEFINES) $(MAKE_FLAGS) $(INCLUDES) $(LIBINCDIRS))
 COPS+=$(strip $(ARMOPS) $(CMSISOPS))
 COPS+=-Os -nostartfiles -ffreestanding -nostdlib
