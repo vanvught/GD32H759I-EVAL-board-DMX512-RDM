@@ -26,8 +26,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include <uart0.h>
-
+#include "uart0.h"
 #include "disk_commands.h"
 
 void DriveSize(const char* path, uint32_t& total_bytes, uint32_t& free_bytes);
@@ -74,14 +73,7 @@ void Dir() {
             if (kStat == 0) {
                 time_t epoch_time = buf.st_mtime;
                 auto* local_time = localtime(&epoch_time);
-                printf("%d-%.2d-%.2d %.2d:%.2d %6u %s\n", 
-                1900 + local_time->tm_year, 
-                1 + local_time->tm_mon, 
-                local_time->tm_mday, 
-                local_time->tm_hour, 
-                local_time->tm_min, 
-                static_cast<unsigned>(buf.st_size),
-                read_dir->d_name);
+                printf("%d-%.2d-%.2d %.2d:%.2d %6u %s\n", 1900 + local_time->tm_year, 1 + local_time->tm_mon, local_time->tm_mday, local_time->tm_hour, local_time->tm_min, static_cast<unsigned>(buf.st_size), read_dir->d_name);
             }
         }
     } while (read_dir != nullptr);

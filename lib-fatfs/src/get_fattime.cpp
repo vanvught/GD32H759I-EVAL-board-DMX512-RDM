@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-#include <time.h>
+#include <ctime>
 
 extern "C" {
 #include "ff14b/source/ff.h"
@@ -38,8 +38,8 @@ DWORD get_fattime() { // NOLINT
     const auto kHour = ((DWORD)local_time->tm_hour) & 0x1F;        // 5 bits (0-23)
     const auto kMin = ((DWORD)local_time->tm_min) & 0x3F;          // 6 bits (0-59)
     const auto kSec = ((DWORD)(local_time->tm_sec >> 1)) & 0x1F;   // 5 bits (0-29)
-    
-    const auto kPacked =  (kYear << 25) | (kMonth << 21) | (kDay << 16) | (kHour << 11) | (kMin << 5) | kSec;
+
+    const auto kPacked = (kYear << 25) | (kMonth << 21) | (kDay << 16) | (kHour << 11) | (kMin << 5) | kSec;
     return kPacked;
 }
 }

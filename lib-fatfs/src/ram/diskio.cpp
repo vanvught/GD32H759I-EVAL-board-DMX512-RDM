@@ -48,7 +48,7 @@ static_assert(FF_MAX_SS == 512);
 
 #ifndef DEV_RAM
 #define DEV_RAM 0
-#endif
+#endif // DEV_RAM
 
 extern "C" {
 extern uint8_t ramdisk_start; // NOLINT // Start of ramdisk address

@@ -84,14 +84,14 @@ int stat(const char* path, struct stat* buf) { // NOLINT
     buf->st_mtime = epoch;
 
     // Map file types and attributes (FatFs AM_DIR maps to S_IFDIR)
-    if (fno.fattrib & AM_DIR) {
+    if ((fno.fattrib & AM_DIR) == AM_DIR) {
         buf->st_mode |= S_IFDIR;
     } else {
         buf->st_mode |= S_IFREG; // Regular file
     }
 
     // Map basic read/write/readonly permissions
-    if (fno.fattrib & AM_RDO) {
+    if ((fno.fattrib & AM_RDO) == AM_RDO) {
         buf->st_mode |= (S_IRUSR | S_IRGRP | S_IROTH); // Read only
     } else {
         buf->st_mode |= (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH); // Read/Write

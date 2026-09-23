@@ -24,8 +24,8 @@
  */
 
 #include <cstddef>
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 #include <errno.h>
 #include <assert.h>
 #include <dirent.h>
@@ -65,8 +65,8 @@ FRESULT s_fresult;
 
 int GetFileDescriptor() {
     for (int file_descriptor = 0; file_descriptor < kOpenFilesMax; file_descriptor++) {
-        if (s_file[file_descriptor].udata == nullptr) {
-            s_file[file_descriptor].udata = &s_ff_file[file_descriptor];
+        if (s_file[file_descriptor]._cookie == nullptr) {
+            s_file[file_descriptor]._cookie = &s_ff_file[file_descriptor];
             return file_descriptor;
         }
     }
@@ -80,7 +80,7 @@ int FatfsToErrno(BYTE error) {
 
     switch (static_cast<FRESULT>(error)) {
         case FR_OK:                  /* FatFS (0) Succeeded */
-            return (0);              /* POSIX OK */
+            return 0;                /* POSIX OK */
         case FR_DISK_ERR:            /* FatFS (1) A hard error occurred in the low level disk I/O layer */
             return (EIO);            /* POSIX Input/output error (POSIX.1) */
         case FR_INT_ERR:             /* FatFS (2) Assertion failed */
@@ -142,9 +142,9 @@ int fileno(FILE* stream) { // NOLINT
 }
 
 // http://elm-chan.org/fsw/ff/doc/open.html
-FILE* fopen(const char* path, const char* mode) { // NOLINT
-    assert(path != nullptr);
-    assert(mode != nullptr);
+FILE* fopen(const char* _path, const char* _type) { // NOLINT
+    assert(_path != nullptr);
+    assert(_type != nullptr);
 
     POSIX_DEBUG_PRINTF("%s %s", path, mode);
 
@@ -152,7 +152,7 @@ FILE* fopen(const char* path, const char* mode) { // NOLINT
     BYTE file_mode;
     BYTE file_option;
 
-    switch (mode[0]) {
+    switch (_type[0]) {
         case 'r':
             file_mode = (BYTE)FA_READ;
             file_option = 0;
@@ -170,8 +170,8 @@ FILE* fopen(const char* path, const char* mode) { // NOLINT
             break;
     }
 
-    while (*++mode != '\0') {
-        switch (*mode) {
+    while (*++_type != '\0') {
+        switch (*_type) {
             case '+':
                 file_mode = (BYTE)(FA_READ | FA_WRITE);
                 break;
@@ -192,7 +192,7 @@ FILE* fopen(const char* path, const char* mode) { // NOLINT
         return nullptr;
     }
 
-    s_fresult = f_open(&s_ff_file[kFd], (TCHAR*)path, (BYTE)(file_mode | file_option));
+    s_fresult = f_open(&s_ff_file[kFd], (TCHAR*)_path, (BYTE)(file_mode | file_option));
     errno = FatfsToErrno(s_fresult);
 
     POSIX_DEBUG_PRINTF("errno=%d", errno);
@@ -201,7 +201,7 @@ FILE* fopen(const char* path, const char* mode) { // NOLINT
         return &s_file[kFd];
     }
 
-    s_file[kFd].udata = nullptr;
+    s_file[kFd]._cookie = nullptr;
     return nullptr;
 }
 
@@ -220,12 +220,12 @@ int fclose(FILE* stream) { // NOLINT
         return EOF;
     }
 
-    s_fresult = f_close((FIL*)stream->udata);
+    s_fresult = f_close((FIL*)stream->_cookie);
     errno = FatfsToErrno(s_fresult);
 
     POSIX_DEBUG_PRINTF("errno=%d", errno);
 
-    stream->udata = nullptr;
+    stream->_cookie = nullptr;
 
     if (s_fresult == FR_OK) {
         return 0;
@@ -243,7 +243,7 @@ int fgetc(FILE* stream) { // NOLINT
     }
 
     char buffer;
-    s_fresult = f_read(reinterpret_cast<FIL*>(stream->udata), &buffer, static_cast<UINT>(1), &bytes_read);
+    s_fresult = f_read(reinterpret_cast<FIL*>(stream->_cookie), &buffer, static_cast<UINT>(1), &bytes_read);
 
     if (s_fresult == FR_OK) {
         if (bytes_read > 0) {
@@ -252,7 +252,7 @@ int fgetc(FILE* stream) { // NOLINT
 
         if (bytes_read < 1) {
             errno = FatfsToErrno(s_fresult);
-            stream->flags |= __SEOF;
+            stream->_flags |= __SEOF;
             return EOF;
         }
     }
@@ -261,10 +261,10 @@ int fgetc(FILE* stream) { // NOLINT
     return EOF;
 }
 
-size_t fread(void* ptr, size_t size, size_t nmemb, FILE* stream) { // NOLINT
+size_t fread(void* ptr, size_t _size, size_t _n, FILE* stream) { // NOLINT
     UINT bytes_read;
 
-    s_fresult = f_read((FIL*)stream->udata, ptr, (size * nmemb), &bytes_read);
+    s_fresult = f_read((FIL*)stream->_cookie, ptr, (_size * _n), &bytes_read);
     errno = FatfsToErrno(s_fresult);
 
     if (s_fresult == FR_OK) {
@@ -276,9 +276,9 @@ size_t fread(void* ptr, size_t size, size_t nmemb, FILE* stream) { // NOLINT
 
 int fseek(FILE* stream, long offset, int whence) { // NOLINT
     if (whence == SEEK_SET) {
-        s_fresult = f_lseek((FIL*)stream->udata, (FSIZE_t)offset);
+        s_fresult = f_lseek((FIL*)stream->_cookie, (FSIZE_t)offset);
     } else if (whence == SEEK_END) {
-        s_fresult = f_lseek((FIL*)stream->udata, f_size((FIL*)stream->udata));
+        s_fresult = f_lseek((FIL*)stream->_cookie, f_size((FIL*)stream->_cookie));
     }
 
     errno = FatfsToErrno(s_fresult);
@@ -290,8 +290,8 @@ int fseek(FILE* stream, long offset, int whence) { // NOLINT
     return -1;
 }
 
-long ftell(FILE* stream) { // NOLINT
-    return (long)f_tell((FIL*)stream->udata);
+long ftell(FILE* stream) {                                   // NOLINT
+    return static_cast<long>(f_tell((FIL*)stream->_cookie)); // NOLINT
 }
 
 char* fgets(char* string, int size, FILE* stream) { // NOLINT
@@ -303,9 +303,9 @@ char* fgets(char* string, int size, FILE* stream) { // NOLINT
         return nullptr;
     }
 
-    if (f_gets(string, size, (FIL*)stream->udata) != string) {
+    if (f_gets(string, size, (FIL*)stream->_cookie) != string) {
         *string = '\0';
-        errno = FatfsToErrno(f_error((FIL*)stream->udata));
+        errno = FatfsToErrno(f_error((FIL*)stream->_cookie));
         return nullptr;
     }
 
@@ -313,16 +313,16 @@ char* fgets(char* string, int size, FILE* stream) { // NOLINT
 }
 
 void clearerr(FILE* stream) { // NOLINT
-    stream->flags &= static_cast<uint8_t>(~__SEOF);
-    stream->flags &= static_cast<uint8_t>(~__SERR);
+    stream->_flags &= static_cast<uint8_t>(~__SEOF);
+    stream->_flags &= static_cast<uint8_t>(~__SERR);
 }
 
 int ferror(FILE* stream) { // NOLINT
-    return (stream->flags & __SERR) == __SERR ? 1 : 0;
+    return (stream->_flags & __SERR) == __SERR ? 1 : 0;
 }
 
 int feof(FILE* stream) { // NOLINT
-    return (stream->flags & __SEOF) == __SEOF ? 1 : 0;
+    return (stream->_flags & __SEOF) == __SEOF ? 1 : 0;
 }
 
 // The following API´s are implemented when CONFIG_FS_ENABLE_WRITE is defined
@@ -336,11 +336,11 @@ int fputs([[maybe_unused]] const char* s, [[maybe_unused]] FILE* stream) { // NO
     assert(stream != nullptr);
     errno = 0;
 
-    return f_puts(s, (FIL*)stream->udata);
+    return f_puts(s, (FIL*)stream->_cookie);
 #endif // CONFIG_FS_ENABLE_WRITE
 }
 
-size_t fwrite([[maybe_unused]] const void* ptr, [[maybe_unused]] size_t size, [[maybe_unused]] size_t nmemb, [[maybe_unused]] FILE* stream) {
+size_t fwrite([[maybe_unused]] const void* ptr, [[maybe_unused]] size_t _size, [[maybe_unused]] size_t _n, [[maybe_unused]] FILE* stream) { // NOLINT
 #ifndef CONFIG_FS_ENABLE_WRITE
     errno = ENOSYS;
     return 0;
@@ -348,7 +348,7 @@ size_t fwrite([[maybe_unused]] const void* ptr, [[maybe_unused]] size_t size, [[
     assert(stream != nullptr);
     UINT bytes_write;
 
-    s_fresult = f_write((FIL*)stream->udata, ptr, (size * nmemb), &bytes_write);
+    s_fresult = f_write((FIL*)stream->_cookie, ptr, (_size * _n), &bytes_write);
     errno = FatfsToErrno(s_fresult);
 
     if (s_fresult == FR_OK) {
@@ -368,7 +368,7 @@ int fputc([[maybe_unused]] int c, [[maybe_unused]] FILE* stream) { // NOLINT
 
     UINT bytes_write;
 
-    s_fresult = f_write((FIL*)stream->udata, &c, 1, &bytes_write);
+    s_fresult = f_write((FIL*)stream->_cookie, &c, 1, &bytes_write);
     errno = FatfsToErrno(s_fresult);
 
     if (s_fresult == FR_OK) {
