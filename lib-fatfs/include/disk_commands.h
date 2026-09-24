@@ -26,9 +26,11 @@
 #ifndef DISK_COMMANDS_H_
 #define DISK_COMMANDS_H_
 
+#include <string_view>
+
 namespace disk::commands {
 void Dir();
-void Del(const char* file_name);
+void Del(std::string_view file_name);
 } // namespace disk::commands
 
 #endif // DISK_COMMANDS_H_

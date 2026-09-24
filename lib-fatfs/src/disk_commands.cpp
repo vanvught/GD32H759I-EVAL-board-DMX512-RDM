@@ -25,6 +25,7 @@
 
 #include <dirent.h>
 #include <sys/stat.h>
+#include <string_view>
 
 #include "uart0.h"
 #include "disk_commands.h"
@@ -82,7 +83,7 @@ void Dir() {
     uart0::PutChar('\n');
 }
 
-void Del(const char* file_name) {
-    uart0::Printf("Del: %s\n", file_name);
+void Del(std::string_view file_name) {
+    uart0::Printf("Del: %.*s\n", static_cast<int>(file_name.size()), file_name.data());
 }
 } // namespace disk::commands
