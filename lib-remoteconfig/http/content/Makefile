@@ -31,9 +31,6 @@ clean :
 generate_content : Makefile generate_content.cpp
 	$(CPP) generate_content.cpp $(INCLUDES) $(COPS) -o generate_content
 	
-pixeltype : $(ROOT)/lib-pixel/include/pixeltype.h
-	 python3 parse_pixeltype.py $(ROOT)/lib-pixel/include/pixeltype.h -o $(CONTENT)/pixeltype.json
-	
-content : generate_content pixeltype
+content : generate_content
 	@echo "Running with directory $(CONTENT)"
 	./generate_content $(CONTENT)
