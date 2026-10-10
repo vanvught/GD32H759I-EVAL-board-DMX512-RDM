@@ -36,7 +36,6 @@ The linker script should contain:
    } > RAM
  */
 
-#include <cassert>
 #include <cstdint>
 #include <cstring>
 #include <cstdio>
@@ -51,8 +50,8 @@ static_assert(FF_MAX_SS == 512);
 #endif // DEV_RAM
 
 extern "C" {
-extern uint8_t ramdisk_start; // NOLINT // Start of ramdisk address
-extern uint8_t ramdisk_end;   // NOLINT // End of ramdisk address
+extern uint8_t ramdisk_start[]; // NOLINT // Start of ramdisk address
+extern uint8_t ramdisk_end[];   // NOLINT // End of ramdisk address
 }
 
 namespace {
@@ -61,7 +60,11 @@ static_assert((kSectorSize & (kSectorSize - 1U)) == 0);
 constexpr uint32_t kRootDirectoryEntries = 32;
 
 size_t RamdiskSize() {
-    return static_cast<size_t>(&ramdisk_end - &ramdisk_start);
+    return reinterpret_cast<uintptr_t>(ramdisk_end) - reinterpret_cast<uintptr_t>(ramdisk_start);
+}
+
+uint8_t* RamdiskData() {
+    return ramdisk_start;
 }
 
 LBA_t SectorCount() {
@@ -71,10 +74,6 @@ LBA_t SectorCount() {
 bool IsValidRange(LBA_t sector, UINT count) {
     const auto kSectorCount = SectorCount();
     return (count != 0) && (sector < kSectorCount) && (static_cast<LBA_t>(count) <= kSectorCount - sector);
-}
-
-uint8_t* RamdiskData() {
-    return &ramdisk_start;
 }
 
 DSTATUS state = STA_NOINIT;
