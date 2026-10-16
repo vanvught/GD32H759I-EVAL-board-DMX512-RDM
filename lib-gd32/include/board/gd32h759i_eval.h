@@ -26,13 +26,13 @@
 #ifndef BOARD_GD32H759I_EVAL_H_
 #define BOARD_GD32H759I_EVAL_H_
 
-#if !defined(BOARD_GD32H759I_EVAL)
+#ifndef BOARD_GD32H759I_EVAL
 # error This file should not be included
 #endif // BOARD_GD32H759I_EVAL
 
-#if defined (MCU_GD32H759_MCU_H_)
+#ifdef MCU_GD32H759_MCU_H_
 # error This file should be included later
-#endif // defined (MCU_GD32H759_MCU_H_)
+#endif // MCU_GD32H759_MCU_H_
 
 #include <stdint.h>
 

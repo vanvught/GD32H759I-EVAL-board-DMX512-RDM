@@ -35,7 +35,7 @@
  */
 
 #define USART0_RCU_USART0		RCU_USART0
-#if defined (USART0_REMAP)
+#ifdef USART0_REMAP
 # define USART0_GPIO_AFx		GPIO_AF_7
 # define USART0_RCU_GPIOx		RCU_GPIOB
 # define USART0_GPIOx			GPIOB
@@ -48,10 +48,10 @@
 # define USART0_GPIOx			GPIOA
 # define USART0_TX_GPIO_PINx	GPIO_PIN_9
 # define USART0_RX_GPIO_PINx	GPIO_PIN_10
-#endif // defined (USART0_REMAP)
+#endif // USART0_REMAP
 
 #define USART1_RCU_USART1		RCU_USART1
-#if defined (USART1_REMAP)
+#ifdef USART1_REMAP
 # define USART1_GPIO_AFx		GPIO_AF_7
 # define USART1_RCU_GPIOx		RCU_GPIOD
 # define USART1_GPIOx			GPIOD
@@ -63,10 +63,10 @@
 # define USART1_GPIOx			GPIOA
 # define USART1_TX_GPIO_PINx	GPIO_PIN_2
 # define USART1_RX_GPIO_PINx	GPIO_PIN_3
-#endif // defined (USART1_REMAP)
+#endif // USART1_REMAP
 
 #define USART2_RCU_USART2		RCU_USART2
-#if defined (USART2_FULL_REMAP)
+#ifdef USART2_FULL_REMAP
 # define USART2_GPIO_AFx		GPIO_AF_7
 # define USART2_RCU_GPIOx		RCU_GPIOD
 # define USART2_GPIOx			GPIOD
@@ -84,10 +84,10 @@
 # define USART2_GPIOx			GPIOB
 # define USART2_TX_GPIO_PINx	GPIO_PIN_10
 # define USART2_RX_GPIO_PINx	GPIO_PIN_11
-#endif // defined (USART2_FULL_REMAP)
+#endif // USART2_FULL_REMAP
 
 #define UART3_RCU_UART3			RCU_UART3
-#if defined (UART3_REMAP)
+#ifdef UART3_REMAP
 # define UART3_GPIO_AFx			GPIO_AF_8
 # define UART3_RCU_GPIOx		RCU_GPIOA
 # define UART3_GPIOx			GPIOA
@@ -99,7 +99,7 @@
 # define UART3_GPIOx			GPIOC
 # define UART3_TX_GPIO_PINx		GPIO_PIN_10
 # define UART3_RX_GPIO_PINx		GPIO_PIN_11
-#endif // defined (UART3_REMAP)
+#endif // UART3_REMAP
 
 #define UART4_RCU_UART4			RCU_UART4
 #define UART4_GPIO_AFx			GPIO_AF_8
@@ -111,7 +111,7 @@
 #define UART4_RX_GPIO_PINx		GPIO_PIN_2
 
 #define USART5_RCU_USART5		RCU_USART5
-#if defined (USART5_REMAP)
+#ifdef USART5_REMAP
 # define USART5_GPIO_AFx		GPIO_AF_8
 # define USART5_RCU_GPIOx		RCU_GPIOG
 # define USART5_GPIOx			GPIOG
@@ -123,10 +123,10 @@
 # define USART5_GPIOx			GPIOC
 # define USART5_TX_GPIO_PINx	GPIO_PIN_6
 # define USART5_RX_GPIO_PINx	GPIO_PIN_7
-#endif // defined (USART5_REMAP)
+#endif // USART5_REMAP
 
 #define UART6_RCU_UART6			RCU_UART6
-#if defined (UART6_REMAP)
+#ifdef UART6_REMAP
 # define UART6_GPIO_AFx			GPIO_AF_7
 # define UART6_RCU_GPIOx		RCU_GPIOF
 # define UART6_GPIOx			GPIOF
@@ -138,7 +138,7 @@
 # define UART6_GPIOx			GPIOE
 # define UART6_TX_GPIO_PINx		GPIO_PIN_8
 # define UART6_RX_GPIO_PINx		GPIO_PIN_7
-#endif // defined (UART6_REMAP)
+#endif // UART6_REMAP
 
 #define UART7_RCU_UART7			RCU_UART7
 #define UART7_GPIO_AFx			GPIO_AF_8
@@ -206,7 +206,7 @@
 #define TIMER2CH0_GPIOx			GPIOA
 #define TIMER2CH0_GPIO_PINx		GPIO_PIN_6
 
-#if defined(TIMER2_FULL_REMAP)
+#ifdef TIMER2_FULL_REMAP
 # define TIMER2_GPIO_AFx		GPIO_AF_2
 # define TIMER2_CH0_RCU_GPIOx	RCU_GPIOC
 # define TIMER2_CH0_GPIOx		GPIOC
