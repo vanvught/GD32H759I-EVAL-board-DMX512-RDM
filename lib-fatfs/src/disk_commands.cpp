@@ -26,8 +26,8 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <string_view>
+#include <cstdio>
 
-#include "uart0.h"
 #include "disk_commands.h"
 
 void DriveSize(const char* path, uint32_t& total_bytes, uint32_t& free_bytes);
@@ -53,7 +53,7 @@ void Dir() {
     uint32_t free_bytes{};
     DriveSize(kDirName, total_bytes, free_bytes);
 
-    uart0::Printf("Capacity: %u\nFree: %u\n\n", static_cast<unsigned>(total_bytes), static_cast<unsigned>(free_bytes));
+    std::printf("Capacity: %u\nFree: %u\n\n", static_cast<unsigned>(total_bytes), static_cast<unsigned>(free_bytes));
 
     struct dirent* read_dir{};
 
@@ -74,16 +74,16 @@ void Dir() {
             if (kStat == 0) {
                 time_t epoch_time = buf.st_mtime;
                 auto* local_time = localtime(&epoch_time);
-                printf("%d-%.2d-%.2d %.2d:%.2d %6u %s\n", 1900 + local_time->tm_year, 1 + local_time->tm_mon, local_time->tm_mday, local_time->tm_hour, local_time->tm_min, static_cast<unsigned>(buf.st_size), read_dir->d_name);
+                std::printf("%d-%.2d-%.2d %.2d:%.2d %6u %s\n", 1900 + local_time->tm_year, 1 + local_time->tm_mon, local_time->tm_mday, local_time->tm_hour, local_time->tm_min, static_cast<unsigned>(buf.st_size), read_dir->d_name);
             }
         }
     } while (read_dir != nullptr);
 
     closedir(dirp);
-    uart0::PutChar('\n');
+    std::putchar('\n');
 }
 
 void Del(std::string_view file_name) {
-    uart0::Printf("Del: %.*s\n", static_cast<int>(file_name.size()), file_name.data());
+    std::printf("Del: %.*s\n", static_cast<int>(file_name.size()), file_name.data());
 }
 } // namespace disk::commands
