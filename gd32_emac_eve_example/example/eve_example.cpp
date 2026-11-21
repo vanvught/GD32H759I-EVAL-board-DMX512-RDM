@@ -85,7 +85,7 @@ void eve_display() {
 #else
 	// Place directly on canvas EVE_VERTEX_TRANSLATE not available.
 	EVE_VERTEX2II((EVE_DISP_WIDTH/2)-(eve_img_bridgetek_logo_width/2), 0, BITMAP_BRIDGETEK_LOGO, 0);
-#endif
+#endif // (defined EVE2_ENABLE || defined EVE3_ENABLE || defined EVE4_ENABLE)
 
 	EVE_CMD_TEXT(EVE_DISP_WIDTH/2, eve_img_bridgetek_logo_height, 28, EVE_OPT_CENTERX, "Touch the counter");
 	EVE_CMD_TEXT(0, EVE_DISP_HEIGHT - 30, 28, 0, timeString);
@@ -110,7 +110,7 @@ void eve_display() {
 				(EVE_DISP_HEIGHT / 2), FONT_CUSTOM, ((counter / units) % 10)+1); //+1 as in the converted font the number '0' is in position 1 in the font table
 		units *= 10;
 	}
-#endif
+#endif // (defined EVE2_ENABLE || defined EVE3_ENABLE || defined EVE4_ENABLE)
 
 	EVE_DISPLAY();
 	EVE_CMD_SWAP();

@@ -125,7 +125,7 @@ void EVE_Init()
 # else
 	// Now start clocking data to the LCD panel
 	HAL_MemWrite8(EVE_REG_PCLK, EVE_DISP_PCLK);
-#endif
+#endif // (defined EVE4_ENABLE) && (defined SET_PCLK_FREQ)
 
 	HAL_MemWrite8(EVE_REG_PWM_DUTY, 127);
 
@@ -186,7 +186,7 @@ void EVE_Init()
 	EVE_CMD_SWAP();
 	EVE_LIB_EndCoProList();
 	EVE_LIB_AwaitCoProEmpty();
-#endif
+#endif // (defined EVE2_ENABLE || defined EVE3_ENABLE || defined EVE4_ENABLE)
 
 	DEBUG_EXIT();
 }
@@ -1058,7 +1058,7 @@ void EVE_CMD_TEXT(int16_t x, int16_t y, int16_t font, uint16_t options, const ch
 #if defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 	//#if defined (BT81X_ENABLE) /* OPT_FORMAT not defined in FT8xx chip */
 	num = (options & EVE_OPT_FORMAT) ? (COUNT_ARGS(string)) : (0); //Only check % characters if option OPT_FORMAT is set
-#endif
+#endif // defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 	HAL_Write32(EVE_ENC_CMD_TEXT);
 	HAL_Write32(((uint32_t)y << 16) | (x & 0xffff));
@@ -1092,7 +1092,7 @@ void EVE_CMD_BUTTON(int16_t x, int16_t y, int16_t w, int16_t h, int16_t font, ui
 #if defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 	//#if defined (BT81X_ENABLE) /* OPT_FORMAT not defined in FT8xx chip */
 	num = (options & EVE_OPT_FORMAT) ? (COUNT_ARGS(string)) : (0); //Only check % characters if option OPT_FORMAT is set
-#endif
+#endif // defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 	HAL_Write32(EVE_ENC_CMD_BUTTON);
 	HAL_Write32(((uint32_t)y << 16) | (x & 0xffff));
@@ -1126,7 +1126,7 @@ void EVE_CMD_TOGGLE(int16_t x, int16_t y, int16_t w, int16_t font, uint16_t opti
 #if defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 	//#if defined (BT81X_ENABLE) /* OPT_FORMAT not defined in FT8xx chip */
 	num = (options & EVE_OPT_FORMAT) ? (COUNT_ARGS(string)) : (0); //Only check % characters if option OPT_FORMAT is set
-#endif
+#endif // defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 	HAL_Write32(EVE_ENC_CMD_TOGGLE);
 	HAL_Write32(((uint32_t)y << 16) | (x & 0xffff));
@@ -1303,7 +1303,7 @@ void EVE_CMD_SETSCRATCH(uint32_t handle)
 	HAL_IncCmdPointer(8);
 }
 
-#endif
+#endif // defined (EVE2_ENABLE) || defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 // ############################  BT81x  ##########################################
 
@@ -1552,7 +1552,7 @@ void EVE_CMD_VIDEOSTARTF()
 	HAL_IncCmdPointer(4);
 }
 
-#endif
+#endif // defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 #if defined (EVE4_ENABLE)
 
@@ -1697,7 +1697,7 @@ void EVE_CMD_PCLKFREQ(uint32_t ftarget, int32_t rounding, uint32_t factual)
 	HAL_Write32(factual);
 	HAL_IncCmdPointer(16);
 }
-#endif
+#endif // defined (EVE4_ENABLE)
 
 // ###############################  FT81x only  ############################
 
@@ -1714,7 +1714,7 @@ void EVE_CMD_CSKETCH(int16_t x, int16_t y, uint16_t w, uint16_t h, uint32_t ptr,
 }
 
 
-#endif
+#endif // EVE2_ENABLE
 
 
 

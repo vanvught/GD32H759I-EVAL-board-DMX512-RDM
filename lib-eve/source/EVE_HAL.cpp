@@ -87,20 +87,20 @@ void HAL_EVE_Init()
 	// for example:
 	HAL_HostCmdWrite(0x44, 0x00); // 0x44 = HostCMD_CLKEXT
 	HAL_HostCmdWrite(0x62, 0x00); // 0x64 = HostCMD_CLK48M
-#endif
+#endif // (defined EVE1_ENABLE)
 
 #if defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 	// can optionally set to 72MHz system clock here
 	// In this case also adjust REG_FREQUENCY a few lines down from here in this file
 	HAL_HostCmdWrite(0x44, 0x00); // 0x44 = HostCMD_CLKEXT
 	HAL_HostCmdWrite(0x61, 0x46);
-#endif
+#endif // defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 
 #if defined (EVE2_ENABLE) || defined (EVE3_ENABLE)|| defined (EVE4_ENABLE)
 	DEBUG_PUTS("Reset");
 	HAL_HostCmdWrite(0x68, 0x00); // Reset
-#endif
+#endif // defined (EVE2_ENABLE) || defined (EVE3_ENABLE)|| defined (EVE4_ENABLE)
 
 	
 	DEBUG_PUTS("Set active");
@@ -120,7 +120,7 @@ void HAL_EVE_Init()
 
 #if defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 	HAL_MemWrite32(EVE_REG_FREQUENCY, 72000000);
-#endif
+#endif // defined (EVE3_ENABLE) || defined (EVE4_ENABLE)
 
 	// This function will not return unless an EVE device is present.
 	MCU_Setup();
@@ -413,4 +413,4 @@ uint16_t HAL_CheckCmdFreeSpace()
 	return Freespace;
 }
 
-#endif // __linux__
+#endif // !defined(USE_LINUX_SPI_DEV) || defined(USE_MPSSE)

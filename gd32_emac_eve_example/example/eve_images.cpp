@@ -354,12 +354,12 @@ uint32_t eve_load_images(uint32_t start_addr)
 	EVE_BITMAP_LAYOUT(EVE_FORMAT_RGB565, img_width * 2, img_height);
 #if (defined EVE2_ENABLE || defined EVE3_ENABLE || defined EVE4_ENABLE)
 	EVE_BITMAP_LAYOUT_H((img_width * 2) >> 10, img_height >> 9);
-#endif
+#endif // (defined EVE2_ENABLE || defined EVE3_ENABLE || defined EVE4_ENABLE)
 	EVE_BITMAP_SIZE(EVE_FILTER_NEAREST, EVE_WRAP_BORDER, EVE_WRAP_BORDER,
 			img_width, img_height);
 #if (defined EVE2_ENABLE || defined EVE3_ENABLE || defined EVE4_ENABLE)
 	EVE_BITMAP_SIZE_H(img_width >> 9, img_height >> 9);
-#endif
+#endif // (defined EVE2_ENABLE || defined EVE3_ENABLE || defined EVE4_ENABLE)
 	EVE_END();
 
 	EVE_DISPLAY();

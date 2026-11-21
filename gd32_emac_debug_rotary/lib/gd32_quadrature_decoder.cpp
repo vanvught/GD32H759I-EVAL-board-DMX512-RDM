@@ -34,11 +34,11 @@ static void GpioConfig() {
 	rcu_periph_clock_enable(RCU_AF);
 # if defined(PWM_TIMER_REMAP)
 	gpio_pin_remap_config(PWM_TIMER_REMAP, ENABLE);
-# endif
+#endif // PWM_TIMER_REMAP
 	gpio_init(PWM_CH0_GPIOx, GPIO_MODE_IPU, GPIO_OSPEED_50MHZ, PWM_CH0_GPIO_PINx | PWM_CH1_GPIO_PINx);
 #else
 	gpio_mode_set(PWM_CH0_GPIOx, GPIO_MODE_INPUT, GPIO_PUPD_PULLUP, PWM_CH0_GPIO_PINx | PWM_CH1_GPIO_PINx);
-#endif
+#endif // defined (GPIO_INIT)
 }
 
 static void TimerConfig() {
